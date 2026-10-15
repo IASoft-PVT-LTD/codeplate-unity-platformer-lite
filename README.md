@@ -1,6 +1,6 @@
 # Unity Platformer Lite: a free CodePlate template
 
-> **Free CodePlate template, v1.0.3.** This repository mirrors the zip on [codeplate.io](https://codeplate.io/t/unity-platformer-lite/).
+> **Free CodePlate template, v1.0.4.** This repository mirrors the zip on [codeplate.io](https://codeplate.io/t/unity-platformer-lite/).
 > Press **Use this template** to start your own repository from it, or [download the zip](https://codeplate.io/t/unity-platformer-lite/).
 > [All templates](https://codeplate.io/) · [Free License](https://codeplate.io/license/free/) · subscribers get it under the [Pro License](https://codeplate.io/license/pro/) with no credit.
 
@@ -42,6 +42,10 @@ The full Unity Platformer adds a second world (the Steam Vaults: five more level
 Open the folder in Unity Hub with 6000.6.5f1, open `Assets/Scenes/Boot.unity`, and press Play. Or build it: `npm run build:web`.
 
 Arrows or WASD move, Space or Z jumps, X or Shift dashes, Esc pauses. A gamepad works too.
+
+## How this template was made
+
+This template was written largely by AI coding agents (Claude, by Anthropic). IASoft reviewed and tested the work. The template's checks run on every change. To test it, a fresh agent was given a made-up project and a set of change requests to carry out with the template. The record of that run is at [codeplate.io/t/unity-platformer-lite/eval/](https://codeplate.io/t/unity-platformer-lite/eval/).
 
 ## License
 
