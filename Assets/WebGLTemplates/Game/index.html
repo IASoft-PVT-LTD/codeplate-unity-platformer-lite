@@ -7,7 +7,7 @@
     <!--
       The web page around the game (npm run build:web; docs/recipes/builds.md). The game fills the
       window; a bar shows loading; on a phone held upright a small card asks to turn it sideways
-      (the game is landscape). Colors match Assets/Resources/UI/Game.uss: change them with the palette.
+      (the game is landscape), in the browser's language when WORDS below has it. Colors match Assets/Resources/UI/Game.uss: change them with the palette.
     -->
     <style>
       :root {
@@ -115,10 +115,20 @@
   </head>
   <body>
     <canvas id="game" width="{{{ WIDTH }}}" height="{{{ HEIGHT }}}" tabindex="-1"></canvas>
-    <div id="loading" class="card">Loading<div class="bar"><div class="fill"></div></div></div>
-    <div id="turn" class="card" role="status"><div class="phone"></div>Turn your phone sideways</div>
+    <div id="loading" class="card"><span class="text">Loading</span><div class="bar"><div class="fill"></div></div></div>
+    <div id="turn" class="card" role="status"><div class="phone"></div><span class="text">Turn your phone sideways</span></div>
     <script src="Build/{{{ LOADER_FILENAME }}}"></script>
     <script>
+      // The page's own words, by the browser's language (the game's are in Content/strings.json;
+      // docs/recipes/add-language.md). Add a block per language the game ships.
+      var WORDS = {
+        en: { loading: "Loading", turn: "Turn your phone sideways", failed: "The game couldn't start: " },
+      };
+      var lang = (navigator.language || "en").toLowerCase().split("-")[0];
+      var words = WORDS[lang] || WORDS.en;
+      document.documentElement.lang = WORDS[lang] ? lang : "en";
+      document.querySelector("#loading .text").textContent = words.loading;
+      document.querySelector("#turn .text").textContent = words.turn;
       var canvas = document.getElementById("game");
       var loading = document.getElementById("loading");
       var fill = loading.querySelector(".fill");
@@ -137,6 +147,9 @@
         symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
 #endif
         streamingAssetsUrl: "StreamingAssets",
+        // Saves and settings (Application.persistentDataPath) are copied to the browser's storage
+        // (IndexedDB) as they are written; without this they're lost on every reload.
+        autoSyncPersistentDataPath: true,
         companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
         productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
         productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
@@ -146,7 +159,7 @@
         loading.style.display = "none";
         canvas.focus();
       }).catch(function (message) {
-        loading.textContent = "The game couldn't start: " + message;
+        loading.textContent = words.failed + message;
       });
     </script>
   </body>

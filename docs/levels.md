@@ -8,6 +8,7 @@ A file has a short header, a `---` line, then the map:
 title: Example Steps
 world: 1
 par_time: 30
+time_limit: 45
 at 14,12: flyer range=2
 ---
 ..............................
@@ -24,7 +25,7 @@ at 14,12: flyer range=2
 ..............................
 ..............f......*........
 ..P.....c.c..........dd....*..
-....w..............C.dd......G
+....w..............C.dd.o....G
 ##############################
 ##############################
 ```
@@ -36,6 +37,7 @@ at 14,12: flyer range=2
 | `title: ...` | Shown on the world map, the level intro and the results. |
 | `world: N` | Which world: its art (`Art/tiles/terrain_wN.png`, `Art/bg/wN_*.png`), music and world-map page. The world must be in `Content/worlds.json`. |
 | `par_time: S` | Target time in seconds, shown on the results screen. |
+| `time_limit: S` | Optional: the level clock counts down from S seconds (see below). Leave it out for no countdown. |
 | `at x,y: kind key=value ...` | Parameters for the actor at column x, row y of the map (both count from 0, top-left). The kind must match the map character there. |
 | `# ...` | A comment. |
 
@@ -60,7 +62,7 @@ at 14,12: flyer range=2
 | `s` | spring (launches `springHeight` tiles) | `-` | moving platform |
 | `w` | walker (stomp it) | `f` | flyer (stomp it) |
 | `k` | spiker (don't stomp it) | `t` | shooter (stomp it; dodge its shots) |
-| `B` | boss: needs `at x,y: boss type=beetle` | | |
+| `B` | boss: needs `at x,y: boss type=beetle` | `o` | clock pickup (+`timeBonus` seconds) |
 
 ## Actor parameters (`at` lines)
 
@@ -72,6 +74,12 @@ at 14,12: flyer range=2
 | `shooter` | `dir=-1` or `1` (fixed aim; default: aims at the player), `interval` (seconds between shots), `delay` (before the first shot) |
 | `boss` | `type=beetle` (required), `health`, `name` (use `_` for spaces: `name=Big_Bertha`) |
 
+## The level clock (`time_limit:`)
+
+A level with `time_limit: S` in its header has a countdown: the HUD shows it big in the top middle, amber from `timeWarning` seconds left, red and pulsing from `timeDanger`. Clock pickups (`o`) add `timeBonus` seconds. When it runs out (time up), the player loses a heart and goes back to the last checkpoint with `timeUpRefill` of the limit on the clock (all of it if no checkpoint was reached: that's back at the start); on the last heart, time up is out of hearts. The clock only runs while the player is alive. A level without `time_limit:` shows the time taken instead (`timeLimit` in `config.json` gives such levels a countdown too; 0, the default, doesn't), and `clockEnabled: false` turns every countdown off. Every key is in `config.json` under `"clock"`; the recipe is `docs/recipes/level-clock.md`.
+
+Picking a limit: about twice the level's recorded run (`npm run replay -- level=N` prints its time), rounded up to 5 s, and at least `par_time` + 10. `npm run check` holds every limit to that: the replay must finish inside 60% of it without the clock pickups, from every checkpoint it reaches it must finish inside 60% of what a time up there leaves, and the limit can't be more than 3x the run (or par time + 15 s, if that's more). Clock pickups are Reach targets, like gems: each must be reachable.
+
 ## Checking a level
 
 ```
@@ -81,4 +89,4 @@ npm run replay -- level=3 trace=30   # also lists the level's enemies: met, defe
 npm run shots -- level=3 x=40   # a screenshot at column 40
 ```
 
-`npm run check` re-runs Reach on every level (every gem, checkpoint and the goal must be reachable with the current movement settings, including double and wall jumps when they're on) and plays every replay (it must finish and beat the boss).
+`npm run check` re-runs Reach on every level (every gem, checkpoint, clock pickup and the goal must be reachable with the current movement settings, including double and wall jumps when they're on) and plays every replay (it must finish and beat the boss without running out of hearts, inside the level's time limit).

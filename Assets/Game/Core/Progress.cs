@@ -37,6 +37,8 @@ namespace Game.Core
             /// <summary>Touch button opacity, 0.2 .. 1.</summary>
             public double TouchOpacity = 0.6;
             public bool Fullscreen;
+            /// <summary>The language code (Loc.Languages); one the game doesn't ship falls back to English.</summary>
+            public string Language = Loc.English;
         }
 
         public readonly Dictionary<int, LevelRecord> Levels = new Dictionary<int, LevelRecord>();
@@ -111,6 +113,7 @@ namespace Game.Core
                     ["touchScale"] = s.TouchScale,
                     ["touchOpacity"] = s.TouchOpacity,
                     ["fullscreen"] = s.Fullscreen,
+                    ["language"] = s.Language,
                 },
             };
             return Json.Write(root);
@@ -171,6 +174,7 @@ namespace Game.Core
                 d.TouchScale = M.Clamp(s.Num("touchScale", d.TouchScale), 0.75, 1.5);
                 d.TouchOpacity = M.Clamp(s.Num("touchOpacity", d.TouchOpacity), 0.2, 1);
                 d.Fullscreen = s.Bool("fullscreen", d.Fullscreen);
+                d.Language = s.Str("language", d.Language);
             }
             return p;
         }

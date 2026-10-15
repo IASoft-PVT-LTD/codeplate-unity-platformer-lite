@@ -25,8 +25,15 @@ namespace Game.Core
         public int MaxDeaths = 30;
         /// <summary>Ticks to wait before starting. The tool retries with different delays when a run fails.</summary>
         public int StartDelay;
+        /// <summary>
+        /// Shifts the pause before each jump (in steps of 13 ticks), so a retry meets moving platforms
+        /// and enemies at another moment. Hearts are limited (a run that runs out of them fails), so
+        /// the tool tries several values instead of dying until the timing happens to work.
+        /// </summary>
+        public int TimingSeed;
         public bool Verbose;
         int _flight = 30;
+        readonly JumpRelease _jumps = new JumpRelease();
         readonly List<SimEvent> _lastEvents = new List<SimEvent>();
 
         public Autopilot(LevelData level, GameConfig config, EnemyConfig enemies)
@@ -46,7 +53,7 @@ namespace Game.Core
             Settle();
             Wait(StartDelay);
             int stuck = 0;
-            while (!World.Finished && World.Tick < MaxTicks && World.Deaths <= MaxDeaths)
+            while (!World.Finished && !World.OutOfHearts && World.Tick < MaxTicks && World.Deaths <= MaxDeaths)
             {
                 if (World.Player.Current == Player.State.Dead)
                 {
@@ -113,7 +120,7 @@ namespace Game.Core
                     continue;
                 }
                 int deaths = World.Deaths;
-                Wait((Math.Min(stuck, 10) + World.Deaths % 4) * 13); // vary timing on retries (moving platforms, enemies)
+                Wait((Math.Min(stuck, 10) + (World.Deaths + TimingSeed) % 4) * 13); // vary timing on retries (moving platforms, enemies)
                 Note($"at {cur}, jump from {takeOff} to {land} with {r.PathInfo[jump]}");
                 _flight = FlightTicks(r.Paths[jump], land - takeOff);
                 WaitForClear(new[] { takeOff, land });
@@ -124,6 +131,61 @@ namespace Game.Core
                 if (stuck > 40) return false;
             }
             return World.Finished;
+        }
+
+        // ------------------------------------------------------------------ held jumps
+
+        /// <summary>
+        /// Lets go of a held jump once the jump is past its apex and falling, so a recorded run never
+        /// holds jump through a fall. Then a hold-to-act move added later (a glide, a slow fall:
+        /// docs/recipes/add-ability.md) doesn't change what the old replays do. The hold is kept
+        /// while an enemy or boss is close below (a held jump on a stomp bounces higher:
+        /// stompBounceHeld), and a fresh press in the air (a wall jump, a double jump) always goes
+        /// through. Once let go, jump stays released until the plan lets go of it too, so the
+        /// release never turns into a new press.
+        /// </summary>
+        public sealed class JumpRelease
+        {
+            int _prevRaw;
+            bool _released;
+
+            /// <param name="prev">The input sent on the tick before (when starting mid-run).</param>
+            public JumpRelease(int prev = 0)
+            {
+                _prevRaw = prev;
+            }
+
+            /// <summary>The input to send this tick for the planned input <paramref name="raw"/>.</summary>
+            public int Apply(World w, int raw)
+            {
+                bool jump = (raw & InputFrame.Jump) != 0;
+                bool held = jump && (_prevRaw & InputFrame.Jump) != 0;
+                _prevRaw = raw;
+                if (!jump)
+                {
+                    _released = false;
+                    return raw;
+                }
+                if (held && (_released || (Falling(w) && !StompBelow(w))))
+                {
+                    _released = true;
+                    return raw & ~InputFrame.Jump;
+                }
+                return raw;
+            }
+
+            /// <summary>In the air and falling faster than the apex hang: holding jump does nothing to the jump any more.</summary>
+            public static bool Falling(World w) => !w.Player.IsGrounded && w.Player.Body.Vel.Y > w.Config.apexHangThreshold;
+
+            /// <summary>An enemy or boss close below the player (a stomp may be coming).</summary>
+            public static bool StompBelow(World w)
+            {
+                var p = w.Player.Body.Pos;
+                foreach (var a in w.Actors)
+                    if (a.Active && (a.IsDangerous || a is Boss) && Math.Abs(a.Pos.X - p.X) < 2.0 && a.Pos.Y > p.Y - 0.5 && a.Pos.Y - p.Y < 5.0)
+                        return true;
+                return false;
+            }
         }
 
         // ------------------------------------------------------------------ boss fights
@@ -172,12 +234,13 @@ namespace Game.Core
         {
             var w = new World(Level, Config, Enemies);
             foreach (int input in Inputs) w.Step(input);
+            var jumps = new JumpRelease(Inputs.Count > 0 ? Inputs[Inputs.Count - 1] : 0);
             int hurtAt = -1, hitAt = -1;
             var boss = w.ActiveBoss;
             for (int t = 0; t < horizon && !w.Finished; t++)
             {
                 var b = w.ActiveBoss ?? boss;
-                var ev = w.Step(PlanInput(plan, t, b?.Pos.X ?? 0, w.Player.Body.Pos.X));
+                var ev = w.Step(jumps.Apply(w, PlanInput(plan, t, b?.Pos.X ?? 0, w.Player.Body.Pos.X)));
                 foreach (var e in ev)
                 {
                     if ((e.Type == SimEventType.Hurt || e.Type == SimEventType.Die) && hurtAt < 0) hurtAt = t;
@@ -444,6 +507,7 @@ namespace Game.Core
 
         List<SimEvent> StepInput(int input)
         {
+            input = _jumps.Apply(World, input);
             Inputs.Add(input);
             var ev = World.Step(input);
             _lastEvents.Clear();

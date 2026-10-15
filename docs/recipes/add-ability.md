@@ -5,7 +5,7 @@ Use this when the user wants double jump or wall jump, a new move (wall climb, g
 ## Turn on a built-in ability
 
 1. In `Assets/Resources/Content/config.json`: `"doubleJumpEnabled": true` (and `airJumps`, `airJumpHeight`), or `"wallJumpEnabled": true` (and the `wall*` numbers). To remove the dash: `"dashEnabled": false` — then check that no level needs it (dash walls `d`, long gaps): `npm run reach`.
-2. Reach and the bot already use double jumps and wall jumps when they're on (wall jumps are tried live against each level's walls: up one wall, or between two walls of a chimney), so a ledge only a wall jump reaches counts as reachable. Run `npm run check`; re-record replays that broke with `npm run autoplay -- level=N`.
+2. Reach and the bot already use double jumps and wall jumps when they're on (wall jumps are tried live against each level's walls: up one wall, or between two walls of a chimney), so a ledge only a wall jump reaches counts as reachable. Run `npm run check`; re-record replays that broke with `npm run autoplay -- level=N`. Each replay's `# moves:` line says which moves were on when it was recorded: a replay that breaks says when a move was switched on since, and `ReplayTests` fails until each replay's line matches `config.json` again (re-record it, or, if it still finishes, update the line by hand).
 3. Look at a contact sheet of the move (Recipe `tune-the-feel.md`, step 5).
 
 ## Add a new move (example: ground pound)
@@ -15,7 +15,8 @@ Use this when the user wants double jump or wall jump, a new move (wall climb, g
 3. **What it does to the world** (breaking blocks below, stunning enemies) goes in `World` (look at how dash walls break: `Collide.WallBreak.Break`).
 4. **View:** a strip in `Art/player/` (in `assets.json` and `ArtSlots`), picked in `PlayerView.Show`; sound and effect in `LevelScreen.OnEvent`.
 5. **Tests** in `MotorTests.cs`: the move happens with the input, not without; disabled when its switch is off. Set the switches a test relies on in the test itself (`Kit.Moves(...)`, or `cfg.groundPoundEnabled = true` on a `Kit.Moves()` copy), never rely on what config.json ships with.
-6. If levels may require it, teach Reach: add a style in `Reach.RecordPaths` and its inputs in `Reach.PathInput` (look at `"dash"` and `"jump_dash"`), so Reach and the bot can use it. A move that depends on the level's tiles (like the wall jump) is a `Live` path, played against the level from each standing spot (look at `"wall"`). Add a test like `ReachTests`: a small room the move is needed for, unreachable without it, and the Autopilot finishing it.
+6. Give it a name in `Replay.Moves` (`Core/Replay.cs`) next to `dash`, `double_jump` and `wall_jump`, so replays record whether it was on. A move that acts while a button is **held** (a glide, a slow fall, a charged jump) is safe for old replays: the bot lets go of jump once a jump starts to fall (`Autopilot.JumpRelease`), so recorded runs don't hold jump through falls.
+7. If levels may require it, teach Reach: add a style in `Reach.RecordPaths` and its inputs in `Reach.PathInput` (look at `"dash"` and `"jump_dash"`), so Reach and the bot can use it. A move that depends on the level's tiles (like the wall jump) is a `Live` path, played against the level from each standing spot (look at `"wall"`). Add a test like `ReachTests`: a small room the move is needed for, unreachable without it, and the Autopilot finishing it.
 
 ## Unlock it later
 

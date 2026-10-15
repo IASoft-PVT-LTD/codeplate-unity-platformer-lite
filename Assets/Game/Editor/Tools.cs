@@ -119,6 +119,11 @@ namespace CodePlate
                 }
                 var o = Game.Core.Replay.Play(c.Level(n), c.Config, c.Enemies, inputs, near: near);
                 Out($"level {n}: {o}");
+                if (!o.Finished || !o.BossesDefeated)
+                {
+                    string note = Game.Core.Replay.MovesNote(File.ReadAllText(path), c.Config, path);
+                    if (note.Length > 0) Out("  " + note);
+                }
                 Out("  " + o.EnemyReport(near).TrimEnd('\n').Replace("\n", "\n  "));
                 ok &= o.Finished && o.BossesDefeated;
             }
@@ -136,9 +141,13 @@ namespace CodePlate
             {
                 var l = c.Level(n);
                 Autopilot win = null, last = null;
+                // Hearts are limited (out of hearts fails the run), so retries change the timing
+                // rather than dying until it happens to work: a start delay, then a timing seed.
+                foreach (int seed in new[] { 0, 1, 2, 3 })
                 foreach (int delay in new[] { 0, 17, 41, 73, 101, 139 })
                 {
-                    var a = new Autopilot(l, c.Config, c.Enemies) { StartDelay = delay, Verbose = verbose };
+                    if (win != null) break;
+                    var a = new Autopilot(l, c.Config, c.Enemies) { StartDelay = delay, TimingSeed = seed, Verbose = verbose };
                     bool won = a.Run();
                     last = a;
                     if (verbose) foreach (var s in a.Log) Out("  " + s);
@@ -147,7 +156,7 @@ namespace CodePlate
                         win = a;
                         break;
                     }
-                    Out($"level {n}: attempt with start delay {delay} failed at tick {a.World.Tick} ({a.World.Deaths} deaths, player at {a.World.Player.Body.Pos})");
+                    Out($"level {n}: attempt with start delay {delay}, timing seed {seed} failed at tick {a.World.Tick} ({a.World.Deaths} deaths{(a.World.OutOfHearts ? ", out of hearts" : "")}, player at {a.World.Player.Body.Pos})");
                 }
                 if (win == null)
                 {
@@ -160,7 +169,7 @@ namespace CodePlate
                 var o = Game.Core.Replay.Play(l, c.Config, c.Enemies, win.Inputs);
                 Directory.CreateDirectory(ProjectPaths.Replays);
                 var path = ProjectPaths.Replay(n);
-                File.WriteAllText(path, Game.Core.Replay.ToText(win.Inputs, $"level {n} {l.Title}: autopilot run, {o.Ticks / 60.0:0.0} s, {o.Deaths} deaths"));
+                File.WriteAllText(path, Game.Core.Replay.ToText(win.Inputs, $"level {n} {l.Title}: autopilot run, {o.Ticks / 60.0:0.0} s, {o.Deaths} deaths", Game.Core.Replay.Moves(c.Config)));
                 Out($"level {n}: {o}; wrote {path}");
             }
             Exit(ok);

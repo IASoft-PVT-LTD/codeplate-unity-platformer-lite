@@ -6,9 +6,21 @@
             <ui:VisualElement class="icon coin-icon" picking-mode="Ignore" />
             <ui:Label name="coins" class="hud-text" text="0" picking-mode="Ignore" />
             <ui:VisualElement class="spacer" picking-mode="Ignore" />
-            <ui:Label name="time" class="hud-text" text="0:00.0" picking-mode="Ignore" />
+            <ui:VisualElement name="gems" class="hud-gems" picking-mode="Ignore" />
         </ui:VisualElement>
-        <ui:VisualElement name="gems" class="hud-gems" picking-mode="Ignore" />
+        <!-- The level clock: top middle, big; a countdown (amber, then red and pulsing near time up) when the level has a time limit, else the time taken. -->
+        <ui:VisualElement class="clock-row" picking-mode="Ignore">
+            <ui:VisualElement name="clock" class="clock" picking-mode="Ignore">
+                <ui:Label name="time" class="clock-text" text="0:00" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="out-of-hearts" class="out-of-hearts" picking-mode="Ignore">
+            <ui:VisualElement class="panel out-of-hearts-panel" picking-mode="Ignore">
+                <ui:Label class="out-of-hearts-title" text="Out of hearts" picking-mode="Ignore" />
+                <ui:Label name="out-of-hearts-note" class="out-of-hearts-small" text="" picking-mode="Ignore" />
+                <ui:Label class="out-of-hearts-small" text="Back to the start of the level" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:Label name="toast" class="toast" text="" picking-mode="Ignore" />
         <ui:VisualElement name="banner" class="banner" picking-mode="Ignore">
             <ui:Label name="banner-small" class="banner-small" text="" picking-mode="Ignore" />

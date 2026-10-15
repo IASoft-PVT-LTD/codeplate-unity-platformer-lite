@@ -10,9 +10,11 @@
             <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Touch buttons" /><ui:Button name="touch" text="Auto" /></ui:VisualElement>
             <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Button size" /><ui:Slider name="touch-size" low-value="0.75" high-value="1.5" /></ui:VisualElement>
             <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Button opacity" /><ui:Slider name="touch-opacity" low-value="0.2" high-value="1" /></ui:VisualElement>
+            <ui:VisualElement name="language-row" class="setting-row" style="display: none;"><ui:Label class="setting-name" text="Language" /><ui:Button name="language" text="English" /></ui:VisualElement>
             <ui:Label name="controls" class="controls-text" text="" />
             <ui:VisualElement class="buttons row">
                 <ui:Button name="reset" text="Reset progress" style="min-width: 100px;" />
+                <ui:Button name="privacy" text="Privacy policy" style="min-width: 100px;" />
                 <ui:Button name="back" text="Back" />
             </ui:VisualElement>
         </ui:VisualElement>

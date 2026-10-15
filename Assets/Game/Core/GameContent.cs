@@ -27,8 +27,8 @@ namespace Game.Core
 
     /// <summary>
     /// Everything the game reads from Assets/Resources: config.json, enemies.json, worlds.json,
-    /// the legend and every level. Loaded through a reader function, so the game (Resources),
-    /// the tests and the tools all load exactly the same data. Problems go to <see cref="Errors"/>.
+    /// strings.json (into Loc), the legend and every level. Loaded through a reader function, so
+    /// the game (Resources), the tests and the tools all load exactly the same data. Problems go to <see cref="Errors"/>.
     /// </summary>
     public sealed class GameContent
     {
@@ -67,6 +67,8 @@ namespace Game.Core
             c.Enemies = EnemyConfig.FromJson(Need(EnemiesPath) ?? "{}", c.Errors);
             c.Legend = Legend.FromJson(Need(LegendPath) ?? "{}", c.Errors);
             ReadWorlds(c, Need(WorldsPath) ?? "{\"worlds\": []}");
+            // The texts in other languages (optional: without the file the game is in English).
+            Loc.Load(read(Loc.Path), c.Errors);
             for (int n = 1; n < 100; n++)
             {
                 var text = read(LevelPath(n));

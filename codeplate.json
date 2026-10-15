@@ -3,9 +3,9 @@
   "spec": 0,
   "id": "unity-platformer-lite",
   "name": "Unity Platformer Lite",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "kind": "game",
-  "summary": "A free pixel-art 2D platformer in Unity 6 and C#: dash, 5 ASCII-map levels, a boss, touch controls, saves and headless checks.",
+  "summary": "A free pixel-art 2D platformer in Unity 6 and C#: 5 ASCII-map levels, a boss, a level clock, a touch d-pad, saves and headless checks.",
   "tags": [
     "unity",
     "csharp",

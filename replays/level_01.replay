@@ -1,4 +1,5 @@
 # level 1 Wind-Up Walk: autopilot run, 13.3 s, 0 deaths
+# moves: dash
 1 .
 86 R
 4 .
@@ -6,24 +7,24 @@
 1 RX
 20 R
 4 .
-30 RJ
-19 R
+27 RJ
+22 R
 18 RJ
 140 R
 4 .
-30 RJ
-25 R
+27 RJ
+28 R
 18 RJ
 155 R
 4 .
-30 RJ
-12 R
+27 RJ
+15 R
 8 L
 2 .
 1 L
 2 .
-30 RJ
-7 R
+27 RJ
+10 R
 1 .
 1 R
 3 .

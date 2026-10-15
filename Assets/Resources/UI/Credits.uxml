@@ -6,7 +6,10 @@
             <ui:ScrollView name="scroll" class="credits-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden">
                 <ui:Label name="credits-text" class="credits-text" text="" />
             </ui:ScrollView>
-            <ui:Button name="back" text="Back" />
+            <ui:VisualElement class="buttons row">
+                <ui:Button name="privacy" text="Privacy policy" />
+                <ui:Button name="back" text="Back" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,3 +1,4 @@
+using Game.Core;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -22,10 +23,20 @@ namespace Game.Runtime
         }
 
         public void Tick() { }
-        public bool Back() => false;
+
+        /// <summary>
+        /// On Android, Back on the title closes the game like other Android games do (progress and
+        /// settings are already saved). Elsewhere Back does nothing here.
+        /// </summary>
+        public bool Back()
+        {
+            if (Application.platform != RuntimePlatform.Android) return false;
+            Application.Quit();
+            return true;
+        }
     }
 
-    /// <summary>Settings (UI/Settings.uxml): volumes, shake, fullscreen, touch buttons, reset progress.</summary>
+    /// <summary>Settings (UI/Settings.uxml): volumes, shake, fullscreen, touch buttons, language, reset progress.</summary>
     public sealed class SettingsScreen : IScreen
     {
         public VisualElement Root { get; }
@@ -63,10 +74,14 @@ namespace Game.Runtime
                 ShowTouchMode();
             });
             ShowTouchMode();
+            // Language: shown once strings.json lists a second language (docs/recipes/add-language.md).
+            var language = Ui.Button(Root, "language", () => App.Screens.ChangeLanguage(Loc.Next(Loc.Language)));
+            if (language != null) language.text = Loc.NameOf(Loc.Language);
+            Ui.Show(Ui.Q<VisualElement>(Root, "language-row"), Loc.Languages.Count > 1);
             var input = App.Input;
             var controls = Ui.Q<Label>(Root, "controls");
-            controls.text =
-                $"Keys: arrows or WASD move, {First(input.Label("Jump"))} jumps, {First(input.Label("Dash"))} dashes, {First(input.Label("Pause"))} pauses.\nGamepad: stick moves, A jumps, X dashes, Start pauses.";
+            controls.text = Loc.T("Keys: arrows or WASD move, {0} jumps, {1} dashes, {2} pauses.\nGamepad: stick moves, A jumps, X dashes, Start pauses.",
+                First(input.Label("Jump")), First(input.Label("Dash")), First(input.Label("Pause")));
             _confirm = Ui.Q<VisualElement>(Root, "confirm");
             Ui.Button(Root, "reset", () =>
             {
@@ -85,13 +100,16 @@ namespace Game.Runtime
                 Ui.Show(_confirm, false);
                 Ui.FocusFirst(Root);
             });
+            Links.PrivacyButton(Root);
             Ui.Button(Root, "back", () => Back());
         }
 
         /// <summary>The first key of a binding list ("Space | Z | K" -> "Space").</summary>
         static string First(string keys) => keys.Split('|')[0].Trim();
 
-        void ShowTouchMode() => _touch.text = char.ToUpper(App.Progress.Settings.TouchControls[0]) + App.Progress.Settings.TouchControls.Substring(1);
+        void ShowTouchMode() => _touch.text = TouchModeName(App.Progress.Settings.TouchControls);
+
+        static string TouchModeName(string mode) => mode == "on" ? Loc.T("On") : mode == "off" ? Loc.T("Off") : Loc.T("Auto");
 
         static void Bind(Slider slider, float value, System.Action<double> set)
         {
@@ -117,7 +135,36 @@ namespace Game.Runtime
         }
     }
 
-    /// <summary>Credits (UI/Credits.uxml), from Assets/Resources/Content/credits.txt.</summary>
+    /// <summary>
+    /// Links the game opens in the device's browser (a new tab on the web; no INTERNET permission
+    /// needed on Android). The privacy policy's address is config.json "privacyPolicyUrl": empty
+    /// (the template's default) hides the "Privacy policy" buttons on Credits and Settings.
+    /// Google Play wants the link in the app.
+    /// </summary>
+    public static class Links
+    {
+        public static string PrivacyPolicy => App.Config?.privacyPolicyUrl ?? "";
+
+        public static void OpenPrivacyPolicy()
+        {
+            if (!string.IsNullOrWhiteSpace(PrivacyPolicy)) Application.OpenURL(PrivacyPolicy);
+        }
+
+        /// <summary>Wires a screen's "privacy" button, or hides it when there's no address.</summary>
+        public static void PrivacyButton(VisualElement root)
+        {
+            var b = root.Q<Button>("privacy");
+            if (b == null) return;
+            bool on = !string.IsNullOrWhiteSpace(PrivacyPolicy);
+            Ui.Show(b, on);
+            if (on) b.clicked += OpenPrivacyPolicy;
+        }
+    }
+
+    /// <summary>
+    /// Credits (UI/Credits.uxml), from Assets/Resources/Content/credits.txt, or credits_&lt;code&gt;.txt
+    /// in another language when there is one (docs/recipes/add-language.md).
+    /// </summary>
     public sealed class CreditsScreen : IScreen
     {
         public VisualElement Root { get; }
@@ -125,7 +172,9 @@ namespace Game.Runtime
         public CreditsScreen()
         {
             Root = Ui.Load("Credits");
-            Ui.Q<Label>(Root, "credits-text").text = Resources.Load<TextAsset>("Content/credits")?.text ?? "";
+            var text = Loc.Language == Loc.English ? null : Resources.Load<TextAsset>($"Content/credits_{Loc.Language}");
+            Ui.Q<Label>(Root, "credits-text").text = (text ?? Resources.Load<TextAsset>("Content/credits"))?.text ?? "";
+            Links.PrivacyButton(Root);
             Ui.Button(Root, "back", () => Back());
         }
 

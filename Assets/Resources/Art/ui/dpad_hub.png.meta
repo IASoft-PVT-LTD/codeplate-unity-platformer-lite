@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0acfbb4d66e87a44885149497bf0c2f4
+guid: 01d0ddb3583b67c46b517024adef9419
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7263575370365774652
-    second: touch_left_0
+      213: 948151976042138465
+    second: dpad_hub_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -99,7 +99,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -112,11 +112,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 4096
+    buildTarget: WebGL
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -128,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: touch_left_0
+      name: dpad_hub_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 48
-        height: 48
+        width: 24
+        height: 24
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4c4521a4fa8923b90800000000000000
-      internalID: -7263575370365774652
+      spriteID: 16b831dd233882d00800000000000000
+      internalID: 948151976042138465
       vertices: []
       indices: 
       edges: []

@@ -26,6 +26,8 @@ namespace Game.Runtime
             Content = GameContent.Load(path => Resources.Load<TextAsset>(path)?.text);
             foreach (var e in Content.Errors) Debug.LogError($"[CodePlate] content: {e}");
             Progress = SaveStore.Load();
+            // The saved language, or English when the game doesn't ship it (any more).
+            Progress.Settings.Language = Loc.Use(Progress.Settings.Language);
             Art = art;
             Audio = audio;
             Input = input;

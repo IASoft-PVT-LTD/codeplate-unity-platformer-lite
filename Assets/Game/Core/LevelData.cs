@@ -30,6 +30,7 @@ namespace Game.Core
             ["coin"] = () => new Pickup(),
             ["gem"] = () => new Pickup(),
             ["heart"] = () => new Pickup(),
+            ["clock"] = () => new Pickup(),
             ["checkpoint"] = () => new Checkpoint(),
             ["goal"] = () => new Checkpoint(),
             ["beetle"] = () => new Beetle(),
@@ -52,6 +53,8 @@ namespace Game.Core
         public int World = 1;
         /// <summary>Target time in seconds, shown on the results screen.</summary>
         public int ParTime = 60;
+        /// <summary>The level clock's time limit in seconds, from `time_limit:` (0 = none: config.json's timeLimit, if any). docs/levels.md.</summary>
+        public int TimeLimit;
         public List<string> Rows = new List<string>();
         public int Width, Height;
         /// <summary>Player start: feet position in tiles.</summary>
@@ -105,8 +108,11 @@ namespace Game.Core
                     case "par_time":
                         if (!int.TryParse(value, out l.ParTime) || l.ParTime < 1) errors.Add($"{where}:{i + 1}: par_time must be a whole number of seconds");
                         break;
+                    case "time_limit":
+                        if (!int.TryParse(value, out l.TimeLimit) || l.TimeLimit < 1) errors.Add($"{where}:{i + 1}: time_limit must be a whole number of seconds");
+                        break;
                     default:
-                        errors.Add($"{where}:{i + 1}: unknown header key '{key}' (title, world, par_time, at)");
+                        errors.Add($"{where}:{i + 1}: unknown header key '{key}' (title, world, par_time, time_limit, at)");
                         break;
                 }
             }

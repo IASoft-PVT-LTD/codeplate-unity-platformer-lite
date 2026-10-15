@@ -14,6 +14,8 @@
     --teal: #5fd3c4;
     --red: #e86a4f;
     --gem: #9ff3ff;
+    --amber: #ffb13b;
+    --alarm: #ff4b4b;
     --font-small: 8px;
     --font: 8px;
     --font-big: 16px;
@@ -395,13 +397,88 @@ Button:disabled {
     margin-left: 2px;
 }
 
-.hud-gems {
+/* The level clock: top middle, twice the HUD's text size, on a dark plate so its colour reads over
+   every background. Amber from timeWarning, red with a pulse from timeDanger; HudView sets the
+   classes and the pulse. A level without a time limit shows the time taken, calm. */
+.clock-row {
     position: absolute;
-    top: 5px;
+    top: 2px;
     left: 0;
     right: 0;
     flex-direction: row;
     justify-content: center;
+}
+
+.clock {
+    background-color: rgba(20, 13, 9, 0.80);
+    border-width: 1px;
+    border-color: var(--muted);
+    border-radius: 4px;
+    padding: 2px 6px 2px 6px;
+    min-width: 52px;
+    align-items: center;
+}
+
+.clock-text {
+    font-size: var(--font-big);
+    color: var(--cream);
+    text-shadow: 1px 1px 0 var(--ink);
+    -unity-text-align: middle-center;
+    padding: 0;
+    margin: 0;
+}
+
+.clock.warn {
+    border-color: var(--amber);
+}
+
+.clock.warn .clock-text {
+    color: var(--amber);
+}
+
+.clock.danger {
+    border-color: var(--alarm);
+    background-color: rgba(48, 6, 14, 0.86);
+}
+
+.clock.danger .clock-text {
+    color: var(--alarm);
+}
+
+/* Gems sit at the top right, after the spacer (the clock has the middle). */
+.hud-gems {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* Out of hearts: a short card, then the level starts again from the beginning. */
+.out-of-hearts {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 6, 4, 0.55);
+    display: none;
+}
+
+.out-of-hearts.on {
+    display: flex;
+}
+
+.out-of-hearts-title {
+    font-size: var(--font-big);
+    color: var(--alarm);
+    text-shadow: 1px 1px 0 var(--ink);
+    -unity-text-align: middle-center;
+}
+
+.out-of-hearts-small {
+    margin-top: 8px;
+    color: var(--cream);
+    -unity-text-align: middle-center;
 }
 
 .banner {
@@ -635,8 +712,8 @@ Toggle:focus #unity-checkmark {
 
 .touch-btn {
     position: absolute;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
 }
 
 .touch-btn.held {
@@ -644,36 +721,80 @@ Toggle:focus #unity-checkmark {
     scale: 0.92 0.92;
 }
 
-#touch-left {
-    left: 8px;
-    bottom: 8px;
-    background-image: resource("Art/ui/touch_left");
-}
-
-#touch-right {
-    left: 60px;
-    bottom: 8px;
-    background-image: resource("Art/ui/touch_right");
-}
-
+/* Kept to the bottom corners but lifted: TouchControls places the d-pad, dash and jump from
+   Game.Core TouchLayout, every bottom edge at least 15% of the screen height up and inside the
+   safe area (the numbers below are only the starting look). */
 #touch-dash {
-    right: 60px;
-    bottom: 8px;
+    right: 78px;
+    bottom: 41px;
     background-image: resource("Art/ui/touch_dash");
 }
 
 #touch-jump {
-    right: 8px;
-    bottom: 26px;
+    right: 10px;
+    bottom: 47px;
+    width: 62px;
+    height: 62px;
     background-image: resource("Art/ui/touch_jump");
 }
 
 #touch-pause {
-    right: 6px;
-    top: 24px;
-    width: 24px;
-    height: 24px;
+    right: 8px;
+    top: 26px;
+    width: 30px;
+    height: 30px;
     background-image: resource("Art/ui/touch_pause");
+}
+
+/* The d-pad: one touch surface (#touch-dpad, a bit larger than the art) with the art inside
+   (.dpad-art), a 3x3 grid of cells; TouchControls sizes both from TouchLayout (about a quarter of
+   the screen width). Each piece only draws: .lit lights an arm or a corner dot while the thumb
+   holds it; .unused dims an arm the game has no use for (config.json "dpadAxes"), and the corner
+   dots of unused diagonals are hidden. */
+.touch-dpad {
+    position: absolute;
+    left: 10px;
+    bottom: 41px;
+    width: 72px;
+    height: 72px;
+}
+
+.dpad-art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 72px;
+    height: 72px;
+}
+
+.dpad-piece {
+    position: absolute;
+    width: 33.333%;
+    height: 33.333%;
+}
+
+.dpad-up { left: 33.333%; top: 0; background-image: resource("Art/ui/dpad_up"); }
+.dpad-up.lit { background-image: resource("Art/ui/dpad_up_lit"); }
+.dpad-left { left: 0; top: 33.333%; background-image: resource("Art/ui/dpad_left"); }
+.dpad-left.lit { background-image: resource("Art/ui/dpad_left_lit"); }
+.dpad-right { left: 66.667%; top: 33.333%; background-image: resource("Art/ui/dpad_right"); }
+.dpad-right.lit { background-image: resource("Art/ui/dpad_right_lit"); }
+.dpad-down { left: 33.333%; top: 66.667%; background-image: resource("Art/ui/dpad_down"); }
+.dpad-down.lit { background-image: resource("Art/ui/dpad_down_lit"); }
+.dpad-hub { left: 33.333%; top: 33.333%; background-image: resource("Art/ui/dpad_hub"); }
+.dpad-corner { background-image: resource("Art/ui/dpad_corner"); }
+.dpad-corner.lit { background-image: resource("Art/ui/dpad_corner_lit"); }
+.dpad-ul { left: 0; top: 0; }
+.dpad-ur { left: 66.667%; top: 0; }
+.dpad-dl { left: 0; top: 66.667%; }
+.dpad-dr { left: 66.667%; top: 66.667%; }
+
+.dpad-arm.unused {
+    opacity: 0.3;
+}
+
+.dpad-corner.unused {
+    display: none;
 }
 
 /* ------------------------------------------------------------------ fade */

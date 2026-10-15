@@ -19,8 +19,14 @@ namespace Game.Runtime
     ///   ticks=N hold=R run N ticks holding letters (L R U D J X) first
     ///   replay=N       play the level's replay for N ticks first (bosses mid-fight, etc.)
     ///   frames=6 every=10   a contact sheet: 6 shots 10 ticks apart in one PNG (motion, animation)
-    ///   touch=1        show the touch buttons;  progress=demo  a save with some levels done
+    ///   touch=1        show the touch controls;  progress=demo  a save with some levels done
+    ///   aspect=20:9    the screen shape: 16:9 (480x270 UI units, the default), 20:9 (600x270, a
+    ///                  2400x1080 phone), 4:3 (512x384, a 2048x1536 tablet); or ui=WxH in UI units
+    ///   safe=L,R,T,B   pretend safe-area insets in UI units (a camera cutout, a gesture bar)
+    ///   timeleft=S     set the level clock to S seconds (the HUD's amber and red stages)
+    ///   hearts=N       set the hearts left;  outofhearts=1  show the "Out of hearts" card
     ///   out=NAME       file name (default from the arguments); scale=2 (pixels per game pixel)
+    ///   lang=CODE      the game in that language (Content/strings.json; docs/recipes/add-language.md)
     /// Your save is never touched: shots use a scratch save file.
     /// </summary>
     public static class ShotDirector
@@ -30,6 +36,7 @@ namespace Game.Runtime
         public static Dictionary<string, string> Args { get; private set; }
 
         public static bool Active => Args != null;
+
 
         /// <summary>Reads `-codeplateShot key=value ...` from the command line. Returns true if a shot was requested.</summary>
         public static bool TryStart(MonoBehaviour host)
@@ -106,8 +113,24 @@ namespace Game.Runtime
                     progress.Record(n, 20 + n * 7.3, new[] { true, n % 2 == 0, n % 3 == 0 }, 10 + n, n % 3);
             }
             if (Arg("touch") == "1") progress.Settings.TouchControls = "on";
+            progress.Settings.Language = Loc.Use(Arg("lang", Loc.English));
             int scale = IntArg("scale", 2);
             ScreenRouter.ZoomOverride = scale;
+            int uiW = App.Config.viewWidth, uiH = App.Config.viewHeight;
+            switch (Arg("aspect"))
+            {
+                case "20:9": uiW = 600; uiH = 270; break;
+                case "4:3": uiW = 512; uiH = 384; break;
+            }
+            var uiSize = Arg("ui").Split('x');
+            if (uiSize.Length == 2 && int.TryParse(uiSize[0], out int uw) && int.TryParse(uiSize[1], out int uh))
+            {
+                uiW = uw;
+                uiH = uh;
+            }
+            var safe = Arg("safe").Split(',');
+            if (safe.Length == 4 && float.TryParse(safe[0], out float sl) && float.TryParse(safe[1], out float sr) && float.TryParse(safe[2], out float st) && float.TryParse(safe[3], out float sb))
+                Ui.SafeInsetsOverride = new Vector4(sl, sr, st, sb);
 
             string screen = Arg("screen", "level");
             int level = IntArg("level", 1);
@@ -155,6 +178,13 @@ namespace Game.Runtime
                     ls.InputOverride = null;
                 }
                 if (Args.ContainsKey("x")) PlacePlayer(ls, IntArg("x", 0), IntArg("y", 0));
+                if (Args.ContainsKey("timeleft")) ls.World.TicksLeft = GameConfig.Ticks(IntArg("timeleft", 60));
+                if (Args.ContainsKey("hearts")) ls.World.Player.Health = IntArg("hearts", 3);
+                if (Arg("outofhearts") == "1")
+                {
+                    ls.World.Player.Health = 0;
+                    ls.Hud.ShowOutOfHearts();
+                }
                 int hold = InputFrame.FromText(Arg("hold", "."));
                 ls.StepTicks(IntArg("ticks", 0), Math.Max(0, hold));
                 // The HUD's banner and toasts time out in real seconds; after a fast-forward, clear them
@@ -164,7 +194,7 @@ namespace Game.Runtime
                 if (screen == "results") ls.ShowResults();
             }
 
-            var rt = new RenderTexture(App.Config.viewWidth * scale, App.Config.viewHeight * scale, 24);
+            var rt = new RenderTexture(uiW * scale, uiH * scale, 24);
             var uiRt = new RenderTexture(rt.width, rt.height, 0);
             App.Screens.Panel.targetTexture = uiRt;
             App.Screens.Panel.clearColor = true;

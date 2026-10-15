@@ -18,7 +18,7 @@ namespace Game.Tests
     /// level through the scene, settings and saving. Uses a scratch save file, never yours.
     /// InputTestFixture gives each test fresh virtual devices.
     /// </summary>
-    public class GameTests : InputTestFixture
+    public partial class GameTests : InputTestFixture
     {
         Keyboard _kb;
         string _save;
@@ -35,9 +35,14 @@ namespace Game.Tests
         public override void TearDown()
         {
             Time.timeScale = 1;
+            AudioListener.pause = false;
             SaveStore.PathOverride = null;
+            TearDownParts();
             base.TearDown();
         }
+
+        /// <summary>Other parts of this partial class (optional features' tests) undo what they set up here.</summary>
+        partial void TearDownParts();
 
         static IEnumerator Boot()
         {
@@ -197,16 +202,17 @@ namespace Game.Tests
             Assert.IsTrue(touch.Visible);
             Assert.AreEqual(DisplayStyle.Flex, touch.Root.resolvedStyle.display);
             var screen = App.Screens.Root.worldBound;
-            foreach (var name in new[] { "left", "right", "jump", "dash", "pause" })
+            foreach (var name in new[] { "dpad", "jump", "dash", "pause" })
             {
                 var r = touch.Button(name).worldBound;
-                Assert.IsTrue(r.width > 10 && screen.Contains(r.center), $"touch button {name} is on screen ({r})");
+                Assert.IsTrue(r.width > 10 && screen.Contains(r.center), $"touch control {name} is on screen ({r})");
             }
+            Assert.IsNull(touch.Button("left"), "the left/right buttons are gone: the d-pad replaced them");
             var p = App.Level.World.Player;
             double x0 = p.Body.Pos.X;
             touch.Simulate("right", true);
             yield return Seconds(0.4f);
-            Assert.Greater(p.Body.Pos.X, x0 + 1.0, "holding the right button runs");
+            Assert.Greater(p.Body.Pos.X, x0 + 1.0, "holding the d-pad's right arm runs");
             touch.Simulate("jump", true, 2);
             yield return Seconds(0.15f);
             Assert.AreNotEqual(Player.State.Ground, p.Current, "a second finger jumps while running");
@@ -218,6 +224,174 @@ namespace Game.Tests
             App.Progress.Settings.TouchControls = "off";
             yield return Frames(2);
             Assert.IsFalse(touch.Visible);
+        }
+
+        [UnityTest]
+        public IEnumerator TheDpadIsOneSurfaceThatFollowsItsFinger()
+        {
+            yield return Boot();
+            App.Progress.Settings.TouchControls = "on";
+            yield return StartLevel(1);
+            yield return Frames(2);
+            var touch = App.Level.Touch;
+            Vector2 At(string piece) => touch.DpadPiece(piece).worldBound.center;
+            var pad = touch.DpadArt.worldBound;
+            var area = touch.Button("dpad").worldBound;
+            Assert.IsTrue(area.Contains(pad.min) && area.Contains(pad.max - new Vector2(0.01f, 0.01f)), $"the touch area {area} holds the drawn pad {pad}");
+            Assert.Greater(area.width * area.height, 1.2f * pad.width * pad.height, "and is a bit bigger than it");
+            Assert.GreaterOrEqual(pad.width, 0.2f * App.Screens.Root.worldBound.width - 3, "the d-pad is about a quarter of the screen's width");
+
+            // One finger: down on the left arm, then slide right without lifting.
+            touch.DpadDown(1, At("left"));
+            Assert.AreEqual(InputFrame.Left, touch.DpadBits);
+            Assert.IsTrue(touch.DpadPiece("left").ClassListContains("lit"), "the held arm lights up");
+            touch.DpadMove(1, pad.center);
+            Assert.AreEqual(0, touch.DpadBits, "the middle is a dead zone");
+            touch.DpadMove(1, At("right"));
+            Assert.AreEqual(InputFrame.Right, touch.DpadBits, "sliding across changes direction");
+            Assert.IsFalse(touch.DpadPiece("left").ClassListContains("lit"));
+            touch.DpadMove(1, At("dr"));
+            Assert.AreEqual(InputFrame.Right | InputFrame.Down, touch.DpadBits, "the corner is the diagonal");
+            Assert.IsTrue(touch.DpadPiece("dr").ClassListContains("lit"));
+            touch.DpadMove(1, new Vector2(pad.xMax + 60, pad.center.y));
+            Assert.AreEqual(InputFrame.Right, touch.DpadBits, "a thumb slid off the pad still steers");
+            touch.DpadUp(1);
+            touch.DpadDown(1, new Vector2(area.xMin + 1, pad.center.y));
+            Assert.AreEqual(InputFrame.Left, touch.DpadBits, "a finger on the margin left of the art is left");
+            touch.DpadMove(1, new Vector2(pad.xMax + 60, pad.center.y));
+
+            // Another finger holds jump at the same time; a third finger on the pad doesn't take over.
+            touch.Simulate("jump", true, 2);
+            touch.DpadDown(3, At("left"));
+            Assert.AreEqual(InputFrame.Right, touch.DpadBits, "the pad keeps following its own finger");
+            Assert.AreEqual(InputFrame.Right | InputFrame.Jump, touch.Bits);
+            touch.DpadMove(3, At("left"));
+            Assert.AreEqual(InputFrame.Right, touch.DpadBits);
+            touch.DpadUp(3);
+            Assert.AreEqual(InputFrame.Right, touch.DpadBits, "lifting another finger changes nothing");
+            touch.DpadUp(1);
+            Assert.AreEqual(0, touch.DpadBits);
+            Assert.AreEqual(InputFrame.Jump, touch.Bits, "jump is still held");
+            touch.Simulate("jump", false, 2);
+
+            // The default axes ("x_down"): up has no use in this game, dimmed and never pressed;
+            // down is wired (drops through ledges).
+            touch.DpadDown(4, At("up"));
+            Assert.AreEqual(0, touch.DpadBits & InputFrame.Up);
+            touch.DpadUp(4);
+            touch.DpadDown(4, At("down"));
+            Assert.AreEqual(InputFrame.Down, touch.DpadBits);
+            touch.DpadUp(4);
+            yield return Frames(2);
+            Assert.AreEqual(0.3f, touch.DpadPiece("up").resolvedStyle.opacity, 0.01f, "the up arm is dimmed");
+            Assert.AreEqual(1f, touch.DpadPiece("down").resolvedStyle.opacity, 0.01f);
+            Assert.AreEqual(DisplayStyle.None, touch.DpadPiece("ul").resolvedStyle.display, "no up diagonals");
+            Assert.AreEqual(DisplayStyle.Flex, touch.DpadPiece("dl").resolvedStyle.display);
+        }
+
+        [UnityTest]
+        public IEnumerator TouchControlsSitAtLeastFifteenPercentUp()
+        {
+            yield return Boot();
+            App.Progress.Settings.TouchControls = "on";
+            yield return StartLevel(1);
+            foreach (double size in new[] { 1.0, 1.5, 0.75 })
+            {
+                App.Progress.Settings.TouchScale = size;
+                yield return Frames(3);
+                var screen = App.Screens.Root.worldBound;
+                foreach (var name in new[] { "dpad", "dpad-art", "jump", "dash" })
+                {
+                    var r = name == "dpad-art" ? App.Level.Touch.DpadArt.worldBound : App.Level.Touch.Button(name).worldBound;
+                    float above = screen.yMax - r.yMax;
+                    Assert.GreaterOrEqual(above, 0.15f * screen.height - 0.5f, $"{name} at size {size}: bottom edge {above} units up of {screen.height}");
+                    Assert.GreaterOrEqual(r.xMin, screen.xMin, name);
+                    Assert.LessOrEqual(r.xMax, screen.xMax, name);
+                }
+                App.Level.Touch.Simulate("jump", true, 9);
+                yield return Frames(2);
+                Assert.GreaterOrEqual(screen.yMax - App.Level.Touch.Button("jump").worldBound.yMax, 0.15f * screen.height - 0.5f, "a pressed button shrinks, never drops");
+                App.Level.Touch.Simulate("jump", false, 9);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator TheClockIsBigInTheTopMiddleAndTurnsAmberThenRed()
+        {
+            yield return Boot();
+            yield return StartLevel(1);
+            yield return Frames(3);
+            var hud = App.Level.Hud;
+            var w = App.Level.World;
+            var screen = App.Screens.Root.worldBound;
+            var clock = hud.Clock.worldBound;
+            Assert.AreEqual(screen.center.x, clock.center.x, 2f, "centred");
+            Assert.Less(clock.yMin, 8f, "at the top");
+            Assert.Greater(hud.ClockLabel.resolvedStyle.fontSize, App.Screens.Root.Q<Label>("coins").resolvedStyle.fontSize, "bigger than the HUD's other text");
+            Assert.Greater(w.Level.TimeLimit, 0, "level 1 has a time limit");
+            Assert.AreEqual(w.Level.TimeLimit * 60, w.AllowanceTicks, "the level's own limit");
+            Assert.AreEqual(LevelClock.Stage.Calm, hud.ClockStage);
+
+            w.TicksLeft = 25 * 60;
+            yield return Frames(2);
+            Assert.AreEqual(LevelClock.Stage.Warning, hud.ClockStage);
+            Assert.IsTrue(hud.Clock.ClassListContains("warn"));
+            var amber = hud.ClockLabel.resolvedStyle.color;
+            Assert.Greater(amber.r, 0.9f);
+            Assert.Greater(amber.g, 0.55f, "amber, not red");
+            Assert.Less(amber.b, 0.4f);
+
+            w.TicksLeft = 8 * 60;
+            yield return Frames(2);
+            Assert.AreEqual(LevelClock.Stage.Danger, hud.ClockStage);
+            Assert.AreEqual("0:08", hud.ClockLabel.text);
+            var red = hud.ClockLabel.resolvedStyle.color;
+            Assert.Greater(red.r, 0.9f);
+            Assert.Less(red.g, 0.4f, "red");
+            Assert.IsTrue(hud.Clock.ClassListContains("danger"));
+        }
+
+        [UnityTest]
+        public IEnumerator AFallCostsAHeartAndRunningOutRestartsTheLevel()
+        {
+            yield return Boot();
+            // A finished run from before: its best time and gems must survive a failed attempt.
+            App.Progress.Record(1, 30, new[] { true, true, false }, 5, 0);
+            yield return StartLevel(1);
+            var level = App.Level;
+            var w = level.World;
+            level.StepTicks(30);
+
+            // A fall with hearts left: one heart less, back at the checkpoint (here the start), no refill.
+            w.Player.Body.Pos = new V2d(w.Player.Body.Pos.X, w.Grid.Height + 3);
+            level.StepTicks(2);
+            Assert.AreEqual(Player.State.Dead, w.Player.Current);
+            Assert.AreEqual(w.Config.maxHealth - 1, w.Player.Health, "the fall cost a heart");
+            level.StepTicks(GameConfig.Ticks(w.Config.respawnDelay) + 2);
+            Assert.AreNotEqual(Player.State.Dead, w.Player.Current, "respawned");
+            Assert.AreEqual(w.Config.maxHealth - 1, w.Player.Health, "and kept the hearts left");
+
+            // Losing the last heart: the card, then the level from the very beginning.
+            w.Checkpoint = new V2d(30.5, w.Checkpoint.Y); // as if a checkpoint were reached
+            w.Player.Health = 1;
+            w.Player.Body.Pos = new V2d(w.Player.Body.Pos.X, w.Grid.Height + 3);
+            level.StepTicks(2);
+            Assert.IsTrue(w.OutOfHearts);
+            yield return Frames(2);
+            Assert.IsTrue(level.Hud.OutOfHeartsShowing, "the Out of hearts card shows");
+            Assert.Greater(level.RestartIn, 0);
+            yield return Seconds((float)w.Config.outOfHeartsTime + 0.5f);
+            Assert.AreNotSame(level, App.Level, "a new attempt");
+            var again = App.Level.World;
+            Assert.AreEqual(1, App.Level.Number);
+            Assert.AreEqual(again.Config.maxHealth, again.Player.Health, "full hearts");
+            Assert.AreEqual(again.Level.Start.X, again.Checkpoint.X, 1e-9, "checkpoints cleared");
+            Assert.Less(again.Tick, 120, "the clock started again");
+            Assert.Greater(again.TicksLeft, again.AllowanceTicks - 120);
+            Assert.AreEqual(0, again.Coins);
+            Assert.IsFalse(App.Level.Hud.OutOfHeartsShowing);
+            Assert.AreEqual(30, App.Progress.Level(1).BestTime, 1e-9, "the saved best time stays");
+            Assert.IsTrue(App.Progress.Level(1).Gems[1], "and the saved gems");
         }
 
         [UnityTest]
@@ -279,6 +453,39 @@ namespace Game.Tests
         }
 
         [UnityTest]
+        public IEnumerator TheLanguageButtonSwitchesTheScreensAndIsSaved()
+        {
+            yield return Boot();
+            Click(FindButton("settings"));
+            yield return Frames(2);
+            Assert.AreEqual(DisplayStyle.None, App.Screens.Root.Q<VisualElement>("language-row").resolvedStyle.display, "one language: no Language row");
+            Click(FindButton("back"));
+            yield return Frames(2);
+            try
+            {
+                Loc.Load("{\"languages\": {\"en\": \"English\", \"xx\": \"Xish\"}, \"texts\": {\"xx\": {\"Play\": \"Plxx\", \"Settings\": \"Setxx\"}}}", null);
+                Click(FindButton("settings"));
+                yield return Frames(2);
+                Assert.AreEqual(DisplayStyle.Flex, App.Screens.Root.Q<VisualElement>("language-row").resolvedStyle.display);
+                Assert.AreEqual("English", FindButton("language").text);
+                Click(FindButton("language"));
+                yield return Frames(2);
+                Assert.AreEqual("xx", Loc.Language);
+                Assert.IsInstanceOf<SettingsScreen>(App.Screens.Current, "Settings stays open, rebuilt");
+                Assert.AreEqual("Xish", FindButton("language").text);
+                Assert.IsNotNull(App.Screens.Current.Root.Q<Label>(className: "heading"));
+                Assert.AreEqual("Setxx", App.Screens.Current.Root.Q<Label>(className: "heading").text, "the UXML texts are translated");
+                Assert.AreEqual("Plxx", FindButton("play").text, "the title underneath is rebuilt too");
+                Assert.AreEqual("xx", Progress.FromJson(File.ReadAllText(_save), out _).Settings.Language, "the choice is saved");
+            }
+            finally
+            {
+                Loc.Load(Resources.Load<TextAsset>(Loc.Path)?.text, null);
+                Loc.Use(Loc.English);
+            }
+        }
+
+        [UnityTest]
         public IEnumerator CreditsShowTheCreditsText()
         {
             yield return Boot();
@@ -290,6 +497,40 @@ namespace Game.Tests
             var scroll = App.Screens.Root.Q<ScrollView>("scroll");
             Assert.AreEqual(ScrollerVisibility.Hidden, scroll.horizontalScrollerVisibility);
             Assert.AreEqual(ScrollViewMode.Vertical, scroll.mode);
+        }
+
+        [UnityTest]
+        public IEnumerator ThePrivacyPolicyButtonShowsOnlyWithAnAddress()
+        {
+            yield return Boot();
+            string before = App.Config.privacyPolicyUrl;
+            try
+            {
+                App.Config.privacyPolicyUrl = "";
+                Click(FindButton("credits"));
+                yield return Frames(2);
+                Assert.AreEqual(DisplayStyle.None, FindButton("privacy").resolvedStyle.display, "no address in config.json: no button");
+                Click(FindButton("back"));
+                yield return Frames(2);
+
+                App.Config.privacyPolicyUrl = "https://example.com/privacy/";
+                Assert.AreEqual("https://example.com/privacy/", Links.PrivacyPolicy);
+                Click(FindButton("credits"));
+                yield return Frames(2);
+                var credits = FindButton("privacy");
+                Assert.AreEqual(DisplayStyle.Flex, credits.resolvedStyle.display, "Credits has a Privacy policy button");
+                Assert.AreEqual("Privacy policy", credits.text);
+                Assert.IsTrue(credits.focusable);
+                Click(FindButton("back"));
+                yield return Frames(2);
+                Click(FindButton("settings"));
+                yield return Frames(2);
+                Assert.AreEqual(DisplayStyle.Flex, FindButton("privacy").resolvedStyle.display, "Settings has one too");
+            }
+            finally
+            {
+                App.Config.privacyPolicyUrl = before;
+            }
         }
 
         [UnityTest]

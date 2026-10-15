@@ -10,7 +10,7 @@ namespace Game.Runtime
     /// once, then turns its events into sounds, effects, shake and HUD updates. Views draw
     /// positions interpolated between ticks and never write to the simulation.
     /// </summary>
-    public sealed class LevelScreen : MonoBehaviour
+    public sealed partial class LevelScreen : MonoBehaviour
     {
         public int Number { get; private set; }
         public LevelData Level { get; private set; }
@@ -24,6 +24,8 @@ namespace Game.Runtime
         public int ResumedFrame = -1;
         /// <summary>Set when the results panel opened.</summary>
         public bool ShowingResults { get; private set; }
+        /// <summary>Seconds until a level that ran out of hearts starts again from the beginning (-1 = not failed).</summary>
+        public float RestartIn { get; private set; } = -1;
 
         public PlayerView PlayerView { get; private set; }
         public HudView Hud { get; private set; }
@@ -53,7 +55,7 @@ namespace Game.Runtime
             World = new World(Level, App.Config, App.Content.Enemies);
             _worldInfo = App.Content.World(Level.World);
             int indexInWorld = App.Content.LevelsOf(Level.World).IndexOf(Level) + 1;
-            DisplayName = $"{Level.World}-{indexInWorld}  {Level.Title}";
+            DisplayName = $"{Level.World}-{indexInWorld}  {Loc.T(Level.Title)}";
 
             _backdrop = Backdrop.Create(transform, Level.World);
             _worldView = new GameObject("World").AddComponent<WorldView>();
@@ -72,10 +74,11 @@ namespace Game.Runtime
             App.Screens.HudLayer.Add(Hud.Root);
             Touch = new TouchControls();
             App.Screens.TouchLayer.Add(Touch.Root);
-            Hud.Banner($"{_worldInfo?.Name ?? "World " + Level.World}  {Level.World}-{indexInWorld}", Level.Title);
+            Hud.Banner($"{(_worldInfo != null ? Loc.T(_worldInfo.Name) : Loc.T("World {0}", Level.World))}  {Level.World}-{indexInWorld}", Loc.T(Level.Title));
             App.Audio.PlayMusic(_worldInfo?.Music ?? "music_world1");
             Remember();
             DrawViews(0);
+            PrepareContinue();
         }
 
         internal void End()
@@ -129,9 +132,16 @@ namespace Game.Runtime
             Touch.Apply();
             if (!App.Screens.OverlayOpen && !World.Finished && Time.frameCount != ResumedFrame && App.Input.PausePressed()) OpenPause();
             if (_finishIn > 0 && (_finishIn -= Time.deltaTime) <= 0) ShowResults();
+            if (RestartIn > 0 && !Paused && !App.Screens.OverlayOpen && (RestartIn -= Time.deltaTime) <= 0) RestartLevel();
             DrawViews(Time.deltaTime);
             _worldView.Sync();
             Hud.Update(World, Time.deltaTime);
+        }
+
+        /// <summary>Leaving the app mid-level (home button, a call, another app on a phone) pauses it.</summary>
+        void OnApplicationPause(bool leaving)
+        {
+            if (leaving && World != null && !App.Screens.OverlayOpen) OpenPause();
         }
 
         public void OpenPause()
@@ -215,11 +225,26 @@ namespace Game.Runtime
                     audio.Play("gem");
                     Fx.Sparkle(at + new Vector2(0, 0.5f), 8);
                     int found = Array.FindAll(World.Gems, g => g).Length;
-                    Hud.Toast($"Gem {found}/{LevelData.GemsPerLevel}");
+                    Hud.Toast(Loc.T("Gem {0}/{1}", found, LevelData.GemsPerLevel));
+                    break;
+                case SimEventType.Clock:
+                    audio.Play("clock");
+                    Fx.Sparkle(at + new Vector2(0, 0.5f), 5);
+                    Hud.Toast("+" + (int)cfg.timeBonus + " seconds");
+                    break;
+                case SimEventType.TimeUp:
+                    Hud.Toast(World.Player.Health > 1 ? Loc.T("Time's up! -1 heart") : Loc.T("Time's up!"));
+                    break;
+                case SimEventType.OutOfHearts:
+                    OutOfHearts();
                     break;
                 case SimEventType.Heart:
                     audio.Play("heart");
                     Hud.Toast("+1 heart");
+                    break;
+                case SimEventType.ExtraHeart:
+                    audio.Play("heart");
+                    Hud.Toast("+1 heart: keep going!", 2f);
                     break;
                 case SimEventType.Stomp:
                     audio.Play("stomp");
@@ -249,7 +274,7 @@ namespace Game.Runtime
                 case SimEventType.Checkpoint:
                     audio.Play("checkpoint");
                     Fx.Sparkle(at + new Vector2(0, 1.5f), 6);
-                    Hud.Toast("Checkpoint");
+                    Hud.Toast(Loc.T("Checkpoint"));
                     break;
                 case SimEventType.Spring:
                     audio.Play("spring");
@@ -270,7 +295,7 @@ namespace Game.Runtime
                     audio.Play("boss_wake");
                     audio.PlayMusic(_worldInfo?.BossMusic ?? "music_boss");
                     var boss = World.ActiveBoss;
-                    if (boss != null) Hud.Banner("Boss", boss.Name, 1.8f);
+                    if (boss != null) Hud.Banner(Loc.T("Boss"), Loc.T(boss.Name), 1.8f);
                     break;
                 case SimEventType.BossTelegraph:
                     break;
@@ -296,7 +321,7 @@ namespace Game.Runtime
                 case SimEventType.GoalOpen:
                     audio.Play("goal_open");
                     Fx.Sparkle(at + new Vector2(0, 1.5f), 10);
-                    Hud.Toast("The door is open!", 2f);
+                    Hud.Toast(Loc.T("The door is open!"), 2f);
                     break;
                 case SimEventType.Goal:
                     audio.Play("goal");
@@ -316,6 +341,42 @@ namespace Game.Runtime
             _newBest = App.Progress.Record(Number, World.Seconds, World.Gems, World.Coins, World.Deaths);
             App.Save();
             _finishIn = 0.7f;
+        }
+
+        /// <summary>
+        /// The last heart is gone: the "Out of hearts" card for a moment, then the level starts again
+        /// from the very beginning (a new World: checkpoints, clock, coins, pickups and gems found this
+        /// attempt all reset). Saved best times and gems from finished runs are untouched: Progress
+        /// only changes when a level is finished.
+        /// </summary>
+        void OutOfHearts()
+        {
+            if (RestartIn > 0) return;
+            App.Audio.StopMusic();
+            bool offered = false;
+            OfferContinue(ref offered);
+            if (offered) return;
+            Hud.ShowOutOfHearts();
+            RestartIn = (float)App.Config.outOfHeartsTime;
+        }
+
+        /// <summary>
+        /// A hook for a continue offer when the hearts run out (an ad, a shop...): another
+        /// part of this partial class can implement it, open its own screen and set
+        /// <paramref name="offered"/>; then the level waits (it doesn't step while an overlay is
+        /// open) and the offer later calls World.ContinueWithExtraHeart or RestartLevel. Not
+        /// implemented: the "Out of hearts" card and the restart.
+        /// </summary>
+        partial void OfferContinue(ref bool offered);
+
+        /// <summary>Called once the level is set up, for whatever OfferContinue needs ready in advance (loading an ad).</summary>
+        partial void PrepareContinue();
+
+        /// <summary>Starts this level again from the beginning (normally outOfHeartsTime after running out of hearts).</summary>
+        public void RestartLevel()
+        {
+            RestartIn = -1;
+            App.PlayLevel(Number);
         }
 
         /// <summary>Shows the results panel now (normally 0.7 s after the goal).</summary>

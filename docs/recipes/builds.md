@@ -23,7 +23,7 @@ The first web build takes a long time (about 10 minutes: it compiles IL2CPP and 
 - The build is compressed with a decompression fallback, so it works on hosts that don't set `Content-Encoding` headers.
 - Touch buttons appear on phones and tablets automatically (Recipe `touch-controls-and-mobile-web.md`). The game runs in landscape; on a phone held upright the page shows a small "Turn your phone sideways" card.
 - The page around the game is `Assets/WebGLTemplates/Game/index.html` (full-window canvas, loading bar, the turn-sideways card). Its colors repeat the palette from `Game.uss`: change them together. The build picks it up by itself.
-- Progress saves in the browser's storage for that site.
+- Progress saves in the browser's storage for that site (IndexedDB): the page passes `autoSyncPersistentDataPath: true` to Unity, which copies the save to it as it's written. Keep that line if you change the page; a project rule fails without it.
 
 ## Desktop
 
@@ -35,3 +35,4 @@ The first web build takes a long time (about 10 minutes: it compiles IL2CPP and 
 
 - The build command ends with `build Succeeded` and the path.
 - Open it (serve the web build locally) and play the first level for a few seconds; tell the user where the files are.
+- Web: change a setting (say the music volume), reload the page, and check it stuck.

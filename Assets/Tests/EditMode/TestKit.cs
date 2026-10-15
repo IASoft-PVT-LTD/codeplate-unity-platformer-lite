@@ -46,12 +46,19 @@ namespace Game.Tests
         /// <summary>
         /// The shipped config.json numbers with every movement switch set explicitly, so a test
         /// doesn't silently depend on what the game ships with: dash on, double jump and wall jump
-        /// off unless asked for, one air jump and one air dash. Use it for small rooms; use Config()
-        /// where the shipped game itself is under test (levels, replays).
+        /// off unless asked for, one air jump and one air dash; the heart rules on (falls cost a
+        /// heart, out of hearts fails the level) and no level clock unless a test sets timeLimit.
+        /// Use it for small rooms; use Config() where the shipped game itself is under test
+        /// (levels, replays).
         /// </summary>
         public static GameConfig Moves(bool dash = true, bool doubleJump = false, bool wallJump = false)
         {
             var cfg = Config();
+            cfg.maxHealth = 3;
+            cfg.fallsCostHeart = true;
+            cfg.outOfHeartsRestarts = true;
+            cfg.clockEnabled = true;
+            cfg.timeLimit = 0;
             cfg.dashEnabled = dash;
             cfg.airDashes = 1;
             cfg.doubleJumpEnabled = doubleJump;

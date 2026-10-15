@@ -66,6 +66,7 @@ namespace Game.Runtime
             new Slot("pickups/coin", 16, 16, 10),
             new Slot("pickups/gem", 16, 16, 6),
             new Slot("pickups/heart", 16, 16, 3),
+            new Slot("pickups/clock", 16, 16, 6),
             new Slot("markers/checkpoint", 16, 32, 8, false),
             new Slot("markers/goal", 32, 48),
             // Effects.

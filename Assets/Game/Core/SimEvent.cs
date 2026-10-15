@@ -10,6 +10,14 @@ namespace Game.Core
         Shoot,
         BossWake, BossTelegraph, BossSlam, BossHit, BossDefeated,
         GoalOpen, Goal,
+        /// <summary>A clock pickup was collected (value = ticks left).</summary>
+        Clock,
+        /// <summary>The level clock ran out: the player loses a heart and goes back to the last checkpoint.</summary>
+        TimeUp,
+        /// <summary>The last heart is gone: the level is failed (the game starts it again from the beginning).</summary>
+        OutOfHearts,
+        /// <summary>A continue gave one heart back after OutOfHearts (World.ContinueWithExtraHeart); the player goes on from the last checkpoint (value = ticks left).</summary>
+        ExtraHeart,
     }
 
     /// <summary>

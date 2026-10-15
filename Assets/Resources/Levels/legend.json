@@ -12,6 +12,7 @@
   "c": {"name": "coin", "actor": "coin"},
   "*": {"name": "gem (exactly 3 per level)", "actor": "gem"},
   "h": {"name": "heart", "actor": "heart"},
+  "o": {"name": "clock pickup (adds timeBonus seconds to the level clock)", "actor": "clock"},
   "s": {"name": "spring", "actor": "spring"},
   "-": {"name": "moving platform (params: dx dy speed w wait)", "actor": "platform"},
   "w": {"name": "walker", "actor": "walker"},

@@ -39,6 +39,7 @@ if (!unity.binary) {
 }
 
 const unityArgs = ['-executeMethod', spec.method];
+if (spec.target) unityArgs.push('-buildTarget', spec.target);
 if (spec.quit !== false && !key.startsWith('build')) unityArgs.push('-quit');
 if (spec.flag) unityArgs.push(spec.flag, args || 'none=0');
 console.log(`Unity ${unity.version}: ${spec.method} ${args}`);

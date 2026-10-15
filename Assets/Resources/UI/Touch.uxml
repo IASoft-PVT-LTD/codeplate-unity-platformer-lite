@@ -1,8 +1,26 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <!-- On-screen buttons for touch screens. Positions and art: Game.uss (#touch-*). Logic: TouchControls.cs. -->
+    <!--
+      On-screen controls for touch screens. Art: Game.uss (#touch-*, .dpad-*). Logic and placement:
+      TouchControls.cs (Game.Core TouchLayout puts every control's bottom edge at least 15% of the
+      screen height up, inside the safe area). The d-pad is ONE touch surface: the finger's position
+      relative to its centre picks the direction (Game.Core Dpad); the pieces inside only draw.
+      #touch-dpad is the touch area (a bit larger than the art, TouchLayout.DpadTouch); #dpad-art
+      inside it is the drawing (TouchLayout.Dpad).
+    -->
     <ui:VisualElement name="touch" class="touch" picking-mode="Ignore">
-        <ui:VisualElement name="touch-left" class="touch-btn" />
-        <ui:VisualElement name="touch-right" class="touch-btn" />
+        <ui:VisualElement name="touch-dpad" class="touch-dpad">
+            <ui:VisualElement name="dpad-art" class="dpad-art" picking-mode="Ignore">
+                <ui:VisualElement name="dpad-up" class="dpad-piece dpad-arm dpad-up" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-left" class="dpad-piece dpad-arm dpad-left" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-right" class="dpad-piece dpad-arm dpad-right" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-down" class="dpad-piece dpad-arm dpad-down" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-hub" class="dpad-piece dpad-hub" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-ul" class="dpad-piece dpad-corner dpad-ul" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-ur" class="dpad-piece dpad-corner dpad-ur" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-dl" class="dpad-piece dpad-corner dpad-dl" picking-mode="Ignore" />
+                <ui:VisualElement name="dpad-dr" class="dpad-piece dpad-corner dpad-dr" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="touch-dash" class="touch-btn" />
         <ui:VisualElement name="touch-jump" class="touch-btn" />
         <ui:VisualElement name="touch-pause" class="touch-btn" />

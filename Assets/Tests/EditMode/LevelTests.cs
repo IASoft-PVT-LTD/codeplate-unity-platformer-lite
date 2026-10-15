@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -126,12 +127,63 @@ namespace Game.Tests
                 return;
             }
             var errors = new List<string>();
-            var inputs = Replay.Parse(File.ReadAllText(path), errors, Path.GetFileName(path));
+            string text = File.ReadAllText(path);
+            var inputs = Replay.Parse(text, errors, Path.GetFileName(path));
             Assert.IsEmpty(errors, string.Join("\n", errors));
             var o = Replay.Play(Kit.Content.Level(n), Kit.Config(), Kit.Enemies, inputs);
-            Assert.IsTrue(o.Finished && o.BossesDefeated,
+            string moves = Replay.MovesNote(text, Kit.Config(), $"replays/level_{n:00}.replay");
+            Assert.IsTrue(o.Finished && o.BossesDefeated && !o.OutOfHearts,
                 $"replays/level_{n:00}.replay no longer finishes: {o}.\n" +
+                (moves.Length > 0 ? moves + "\n" : "") +
                 $"See where it goes wrong: npm run replay -- level={n} trace=30. Then fix the level or make a new run: npm run autoplay -- level={n}. Never just delete it.");
+        }
+
+        /// <summary>The recorded run may use at most this share of a level's time limit (clock pickups not counted).</summary>
+        public const double RunShareOfLimit = 0.6;
+
+        /// <summary>
+        /// A level clock is a real limit, so it must be fair (docs/recipes/level-clock.md). For each
+        /// level with a countdown (`time_limit:`, or config.json's timeLimit): the recorded run must
+        /// finish with at least 40% of the limit left, ignoring the clock pickups it collects, with
+        /// no time up and a heart to spare; from every checkpoint it reaches, the rest of the level
+        /// must fit in 60% of what a time up there leaves on the clock. The limit must also stay
+        /// tight: at most 3x the recorded run (or par time + 15 s if that is more), and at least
+        /// par time + 10 s. Levels without a countdown are skipped.
+        /// </summary>
+        [TestCaseSource(nameof(LevelNumbers))]
+        public void EveryTimeLimitIsBeatenByTheReplayWithMargin(int n)
+        {
+            var level = Kit.Content.Level(n);
+            var cfg = Kit.Config();
+            var probe = new World(level, cfg, Kit.Enemies);
+            if (!probe.TimerOn)
+            {
+                Assert.Pass($"level {n} has no level clock");
+                return;
+            }
+            var path = Kit.ReplayPath(n);
+            Assert.IsTrue(File.Exists(path), $"level {n} has a time limit but no replay to measure it against: npm run autoplay -- level={n}");
+            // The clock pickups don't count: the run must make it on the limit alone.
+            var noBonus = cfg.Clone();
+            noBonus.timeBonus = 0;
+            var o = Replay.Play(level, noBonus, Kit.Enemies, Replay.Parse(File.ReadAllText(path), new List<string>()));
+            Assert.IsTrue(o.Finished, $"level {n}: {o}");
+            Assert.IsFalse(o.OutOfHearts, $"level {n}: the run lost every heart");
+            Assert.AreEqual(0, o.TimeUps, $"level {n}: time ran out during the run");
+            Assert.Greater(o.Hearts, 0);
+            double run = o.Ticks / 60.0, limit = probe.AllowanceTicks / 60.0;
+            Assert.LessOrEqual(run, limit * RunShareOfLimit,
+                $"level {n}: the recorded run needs {run:0.0} s of the {limit} s limit; it must finish inside {RunShareOfLimit:P0} of it. Raise time_limit (about 2x the run) or make the level shorter.");
+            Assert.LessOrEqual(limit, Math.Max(3 * run, level.ParTime + 15),
+                $"level {n}: {limit} s is more than 3x the recorded run's {run:0.0} s and more than par time + 15 s: too generous, sloppy play would never run out");
+            Assert.GreaterOrEqual(limit, level.ParTime + 10, $"level {n}: a run at par time ({level.ParTime} s) should finish with 10 s to spare");
+            double refill = limit * cfg.timeUpRefill;
+            foreach (int reached in o.CheckpointTicks)
+            {
+                double rest = (o.Ticks - reached) / 60.0;
+                Assert.LessOrEqual(rest, refill * RunShareOfLimit,
+                    $"level {n}: from the checkpoint reached at {reached / 60.0:0.0} s the run needs {rest:0.0} s, but a time up there leaves {refill:0.0} s");
+            }
         }
 
         [Test]

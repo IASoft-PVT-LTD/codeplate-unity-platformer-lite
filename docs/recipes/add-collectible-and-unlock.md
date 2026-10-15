@@ -1,13 +1,13 @@
 # Add a collectible or an unlock
 
-Use this when the user wants a new pickup (a key, a timed power-up, a 1-up), or wants gems or coins to unlock something (a bonus level, a skin, a world).
+Use this when the user wants a new pickup (a key, a timed power-up, a 1-up; time pickups for the level clock already exist: `level-clock.md`), or wants gems or coins to unlock something (a bonus level, a skin, a world).
 
 ## A new pickup
 
 1. **Kind:** pickups are `Pickup` actors told apart by `Kind`. Add the kind to `LevelData.ActorTypes` (`["key"] = () => new Pickup()`) and a letter to `legend.json` (`"k"` is taken: pick a free one).
 2. **Effect** in `World.Collect` (`Assets/Game/Core/World.cs`): a new `case "key":` that changes world state (e.g. `Keys++`) and emits an event (add `SimEventType.Key`). A timed power-up: a tick counter on `Player` (e.g. `SpeedBoostTicks`) that `Player.Step` reads and counts down; its numbers in `config.json` + `GameConfig.cs`.
 3. **What it opens:** e.g. a locked door is a tile or actor that checks `world.Keys` in `Touched`.
-4. **Art and feedback:** a strip under `Art/pickups/` (in `assets.json` and `ArtSlots`; no art yet? a stand-in strip of its own, Recipe `reskin-and-rebrand.md` **Stand-in art**), a line in `ActorView.ART`, a sound and toast in `LevelScreen.OnEvent`, and maybe a HUD counter (`UI/Hud.uxml` + `HudView.Update`).
+4. **Art and feedback:** a strip under `Art/pickups/` (in `assets.json` and `ArtSlots`; no art yet? a stand-in strip of its own, Recipe `reskin-and-rebrand.md` **Stand-in art**), a line in `ActorView.ART` (its own slot: never point a new pickup at another pickup's art; if it must reuse art for now, tell the user it looks the same as that one; the project rules warn when two pickup strips have the same pixels or two kinds share one strip), a sound and toast in `LevelScreen.OnEvent`, and maybe a HUD counter (`UI/Hud.uxml` + `HudView.Update`).
 5. **Saved?** If it should persist between plays, add it to `Progress` (Recipe `save-data.md`).
 6. **Test** it in `WorldTests.cs`: collected once, the effect happens.
 

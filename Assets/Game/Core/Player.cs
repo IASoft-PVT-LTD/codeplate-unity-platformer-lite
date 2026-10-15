@@ -47,12 +47,11 @@ namespace Game.Core
         /// <summary>Ticks of invulnerability left (views blink while it's above 0).</summary>
         public int InvulnTicks => _invuln;
 
-        /// <summary>Puts the player at pos, at rest and full health (respawn).</summary>
+        /// <summary>Puts the player at pos, at rest (respawn). Health stays as it is: lost hearts don't come back (World refills them when it must).</summary>
         public void ResetAt(V2d pos)
         {
             Body.Pos = pos;
             Body.Vel = V2d.Zero;
-            Health = _cfg.maxHealth;
             Current = State.Air;
             _jumping = false;
             _hurt = _buffer = _coyote = _dashTicks = _dashCooldown = 0;

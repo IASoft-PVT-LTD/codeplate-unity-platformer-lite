@@ -93,8 +93,39 @@ namespace Game.Core
         public double invulnTime = 1.0;
         /// <summary>Knockback on a hit: x away from the danger, y upward (negative = up).</summary>
         public V2d knockback = new V2d(6.0, -9.0);
-        /// <summary>Seconds between dying and respawning at the last checkpoint.</summary>
+        /// <summary>Seconds between dying and respawning at the last checkpoint (with the hearts left).</summary>
         public double respawnDelay = 0.9;
+        /// <summary>A fall into a pit costs a heart, like a hit (false: falls only send you back to the checkpoint).</summary>
+        public bool fallsCostHeart = true;
+        /// <summary>
+        /// Losing the last heart fails the level: the "Out of hearts" card for outOfHeartsTime, then the
+        /// level starts again from the beginning (checkpoints, clock, coins reset; saved progress stays).
+        /// false: the classic rule, respawn at the last checkpoint with full hearts.
+        /// </summary>
+        public bool outOfHeartsRestarts = true;
+        /// <summary>Seconds the "Out of hearts" card shows before the level starts again.</summary>
+        public double outOfHeartsTime = 2.2;
+
+        // ---- level clock (docs/levels.md, docs/recipes/level-clock.md)
+        /// <summary>
+        /// Off: no level has a countdown, whatever its `time_limit:` says (the HUD shows the time taken).
+        /// On: a level with `time_limit:` (or timeLimit below) counts down to time up.
+        /// </summary>
+        public bool clockEnabled = true;
+        /// <summary>Seconds for a level without its own `time_limit:` header. 0 = such levels have no countdown.</summary>
+        public double timeLimit = 0;
+        /// <summary>Seconds a clock pickup ('o') adds.</summary>
+        public double timeBonus = 10.0;
+        /// <summary>The HUD clock turns amber at this many seconds left.</summary>
+        public double timeWarning = 30.0;
+        /// <summary>The HUD clock turns red and pulses at this many seconds left.</summary>
+        public double timeDanger = 10.0;
+        /// <summary>
+        /// Time up costs a heart and sends the player back to the last checkpoint with this share of
+        /// the level's time limit on the clock (the full limit when no checkpoint was reached yet:
+        /// that's back at the start).
+        /// </summary>
+        public double timeUpRefill = 0.6667;
 
         // ---- combat
         /// <summary>Bounce speed after stomping an enemy (held jump bounces higher).</summary>
@@ -120,6 +151,17 @@ namespace Game.Core
         public int viewHeight = 270;
         /// <summary>On-screen touch buttons: "auto" (only on touch screens), "always" or "off". Settings can override.</summary>
         public string touchControls = "auto";
+        /// <summary>
+        /// The touch d-pad's directions: "x_down" (left, right and down: down + jump drops through a
+        /// one-way ledge, down falls faster; up is dimmed), "x" (left and right), "xy" (all four and
+        /// the diagonals) or "y". Game.Core Dpad.
+        /// </summary>
+        public string dpadAxes = "x_down";
+        /// <summary>
+        /// The privacy policy's web address. Set: Credits and Settings show a "Privacy policy" button
+        /// that opens it (Google Play wants one in the app). Empty: no button.
+        /// </summary>
+        public string privacyPolicyUrl = "";
 
         // ---- camera (views only)
         /// <summary>How far ahead of the player the camera looks, in tiles.</summary>
@@ -228,6 +270,9 @@ namespace Game.Core
             if (err != null) errors.Add(err);
             else if (root == null) errors.Add($"{where}: expected an object");
             else ConfigReader.Fill(cfg, root, where, errors, flattenGroups: true);
+            Dpad.Parse(cfg.dpadAxes, out bool axesOk);
+            if (!axesOk) errors.Add($"{where}: \"dpadAxes\" must be \"x_down\", \"x\", \"xy\" or \"y\" (found \"{cfg.dpadAxes}\")");
+            if (cfg.timeUpRefill <= 0 || cfg.timeUpRefill > 1) errors.Add($"{where}: \"timeUpRefill\" must be above 0 and at most 1 (a share of the level's time limit)");
             return cfg;
         }
     }

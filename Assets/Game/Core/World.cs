@@ -27,7 +27,23 @@ namespace Game.Core
         /// <summary>Which of the level's 3 gems were found, by gem index.</summary>
         public readonly bool[] Gems = new bool[LevelData.GemsPerLevel];
         public int Deaths;
+        /// <summary>The level clock's time limit in ticks: the level's `time_limit:`, else config.json's timeLimit (0 = no countdown).</summary>
+        public readonly int AllowanceTicks;
+        /// <summary>Ticks left on the level clock (clock pickups add to it). Only counts down while the player is alive.</summary>
+        public int TicksLeft;
+        /// <summary>This level has a countdown (clockEnabled, and a time limit from the level or config.json).</summary>
+        public bool TimerOn => Config.clockEnabled && AllowanceTicks > 0;
+        public double TimeLeft => TicksLeft * GameConfig.Dt;
+        bool _timeUp, _checkpointReached;
         public bool Finished;
+        /// <summary>
+        /// The last heart is gone and outOfHeartsRestarts is on: the level is failed. The world keeps
+        /// stepping its actors but the player never comes back; the game starts the level again from
+        /// the beginning (a new World), or a continue gives a heart back (<see cref="ContinueWithExtraHeart"/>).
+        /// </summary>
+        public bool OutOfHearts;
+        /// <summary>Continues (<see cref="ContinueWithExtraHeart"/>) used in this attempt.</summary>
+        public int ContinuesUsed;
         /// <summary>The goal opens once every boss is defeated (at once in levels without a boss).</summary>
         public bool GoalOpen;
         public V2d Checkpoint;
@@ -50,6 +66,8 @@ namespace Game.Core
             Enemies = enemies ?? new EnemyConfig();
             Grid = level.BuildGrid();
             Checkpoint = level.Start;
+            AllowanceTicks = GameConfig.Ticks(level.TimeLimit > 0 ? level.TimeLimit : config.timeLimit);
+            TicksLeft = AllowanceTicks;
             Rng = new Rng((uint)(level.Number * 2654435761u + 1));
             Player = new Player(config, level.Start);
             Actors = level.BuildActors();
@@ -100,20 +118,30 @@ namespace Game.Core
             _prevBottom = Player.Body.Bottom;
             if (Player.Current == Player.State.Dead)
             {
-                if (--_respawnIn <= 0) Respawn();
+                if (!OutOfHearts && --_respawnIn <= 0) Respawn();
             }
             else
             {
                 Player.Step(input, Grid, Surfaces, _events);
                 Crumble();
                 TouchActors();
+                if (TimerOn && !Finished && Player.Current != Player.State.Dead && --TicksLeft <= 0)
+                {
+                    TicksLeft = 0;
+                    _timeUp = true;
+                    Emit(SimEventType.TimeUp, Player.Body.Pos);
+                    Die(loseHeart: true);
+                }
                 if (Player.Current != Player.State.Dead && Collide.TouchingSpikes(Player.Body, Grid)) HurtPlayer(Player.Body.Pos.X);
-                if (Player.Body.Top > Grid.Height + 1) Die();
+                if (Player.Current != Player.State.Dead && Player.Body.Top > Grid.Height + 1) Die(loseHeart: Config.fallsCostHeart);
             }
             RestoreCrumbled();
             Actors.RemoveAll(a => a.Transient && !a.Active);
             return _events;
         }
+
+        /// <summary>The events of the last Step (or of ContinueWithExtraHeart).</summary>
+        public IReadOnlyList<SimEvent> LastEvents => _events;
 
         /// <summary>Adds an actor during play (projectiles). It's set up and starts stepping next tick.</summary>
         public void Spawn(Actor a)
@@ -128,7 +156,7 @@ namespace Game.Core
         /// <summary>Called by enemies when the player touches them unsafely.</summary>
         public void HurtPlayer(double fromX)
         {
-            if (Player.Hurt(fromX, _events) && Player.Health <= 0) Die();
+            if (Player.Hurt(fromX, _events) && Player.Health <= 0) Die(loseHeart: false); // the hit took the last heart
         }
 
         /// <summary>Called by enemies when stomped: the player bounces (higher while holding jump).</summary>
@@ -153,6 +181,10 @@ namespace Game.Core
                     if (p.GemIndex >= 0 && p.GemIndex < Gems.Length) Gems[p.GemIndex] = true;
                     Emit(SimEventType.Gem, p.Pos, p.GemIndex);
                     break;
+                case "clock":
+                    TicksLeft += GameConfig.Ticks(Config.timeBonus);
+                    Emit(SimEventType.Clock, p.Pos, TicksLeft);
+                    break;
                 case "heart":
                     Player.Health = Math.Min(Player.Health + 1, Config.maxHealth);
                     Emit(SimEventType.Heart, p.Pos, Player.Health);
@@ -163,6 +195,7 @@ namespace Game.Core
         public void ReachCheckpoint(Checkpoint c)
         {
             Checkpoint = c.Origin;
+            _checkpointReached = true;
             Emit(SimEventType.Checkpoint, c.Pos);
         }
 
@@ -211,8 +244,8 @@ namespace Game.Core
         {
             var sb = new StringBuilder();
             var b = Player.Body;
-            sb.AppendFormat(CultureInfo.InvariantCulture, "t{0} p{1:F4},{2:F4} {3} h{4} c{5} g{6}{7}{8} d{9} f{10}",
-                Tick, b.Pos.X, b.Pos.Y, Player.Current, Player.Health, Coins, Gems[0] ? 1 : 0, Gems[1] ? 1 : 0, Gems[2] ? 1 : 0, Deaths, Finished ? 1 : 0);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "t{0} p{1:F4},{2:F4} {3} h{4} c{5} g{6}{7}{8} d{9} f{10} s{11}",
+                Tick, b.Pos.X, b.Pos.Y, Player.Current, Player.Health, Coins, Gems[0] ? 1 : 0, Gems[1] ? 1 : 0, Gems[2] ? 1 : 0, Deaths, Finished ? 1 : OutOfHearts ? 2 : 0, TicksLeft);
             foreach (var a in Actors) sb.Append(' ').Append(a.Snapshot());
             return sb.ToString();
         }
@@ -220,17 +253,58 @@ namespace Game.Core
         /// <summary>Crumble state for views: 0 intact, 1 cracking, 2 broken.</summary>
         public int CrumbleState(Cell c) => _broken.ContainsKey(c) ? 2 : _crumbling.ContainsKey(c) ? 1 : 0;
 
-        void Die()
+        /// <summary>
+        /// A death. Falls (fallsCostHeart) and time up cost a heart here (<paramref name="loseHeart"/>);
+        /// an enemy's or spike's hit already took its heart. With hearts left the player respawns at
+        /// the last checkpoint keeping them. With none: OutOfHearts (outOfHeartsRestarts), or the
+        /// classic rule, a respawn with full hearts.
+        /// </summary>
+        void Die(bool loseHeart)
         {
             if (Player.Current == Player.State.Dead) return;
+            if (loseHeart && Player.Health > 0) Player.Health--;
             Player.Kill();
             Deaths++;
             _respawnIn = GameConfig.Ticks(Config.respawnDelay);
-            Emit(SimEventType.Die, Player.Body.Pos);
+            Emit(SimEventType.Die, Player.Body.Pos, Player.Health);
+            if (Player.Health <= 0 && Config.outOfHeartsRestarts)
+            {
+                OutOfHearts = true;
+                Emit(SimEventType.OutOfHearts, Player.Body.Pos);
+            }
         }
+
+        /// <summary>
+        /// A continue after running out of hearts (an ad or a shop can grant one): one
+        /// heart, back at the last checkpoint (the start if none), keeping coins, gems and the clock
+        /// as they were when the last heart went. If that heart went at time up, the clock gets the
+        /// usual time-up refill, as a time up with hearts left would. Returns false (and changes
+        /// nothing) unless the level is out of hearts. Its events (Respawn, ExtraHeart) are in
+        /// <see cref="LastEvents"/> until the next Step.
+        /// </summary>
+        public bool ContinueWithExtraHeart()
+        {
+            if (!OutOfHearts || Finished) return false;
+            _events.Clear();
+            OutOfHearts = false;
+            ContinuesUsed++;
+            Player.Health = 1;
+            Respawn();
+            Emit(SimEventType.ExtraHeart, Checkpoint, TicksLeft);
+            return true;
+        }
+
+        /// <summary>The clock after a time up: timeUpRefill of the limit at a checkpoint, all of it back at the start.</summary>
+        public int TimeUpRefillTicks => _checkpointReached ? GameConfig.Ticks(AllowanceTicks * GameConfig.Dt * Config.timeUpRefill) : AllowanceTicks;
 
         void Respawn()
         {
+            if (_timeUp)
+            {
+                _timeUp = false;
+                TicksLeft = TimeUpRefillTicks;
+            }
+            if (Player.Health <= 0) Player.Health = Config.maxHealth; // the classic rule (outOfHeartsRestarts false)
             Player.ResetAt(Checkpoint);
             foreach (var a in Actors) a.OnPlayerRespawn(this);
             Actors.RemoveAll(a => a.Transient && !a.Active);

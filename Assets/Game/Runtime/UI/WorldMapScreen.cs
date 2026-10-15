@@ -57,9 +57,10 @@ namespace Game.Runtime
 
         void Build()
         {
-            var info = App.Content.World(World) ?? new WorldInfo { Id = World, Name = $"World {World}" };
-            _worldName.text = info.Name;
-            _worldSub.text = info.Subtitle;
+            var info = App.Content.World(World);
+            _worldName.text = info != null ? Loc.T(info.Name) : Loc.T("World {0}", World);
+            _worldSub.text = info != null ? Loc.T(info.Subtitle) : "";
+            info ??= new WorldInfo { Id = World };
             int wi = App.Content.Worlds.FindIndex(w => w.Id == World);
             _prev.SetEnabled(wi > 0);
             _next.SetEnabled(wi >= 0 && wi < App.Content.Worlds.Count - 1);
@@ -133,7 +134,7 @@ namespace Game.Runtime
                 _area.Add(gemRow);
                 if (unlocked) focus = node;
             }
-            _gemTotal.text = $"Gems {gems}/{levels.Count * LevelData.GemsPerLevel}";
+            _gemTotal.text = Loc.T("Gems {0}/{1}", gems, levels.Count * LevelData.GemsPerLevel);
             if (focus != null)
             {
                 var f = focus;
@@ -145,10 +146,10 @@ namespace Game.Runtime
         void ShowInfo(LevelData level)
         {
             int indexInWorld = App.Content.LevelsOf(level.World).IndexOf(level) + 1;
-            _levelName.text = $"{level.World}-{indexInWorld}  {level.Title}";
+            _levelName.text = $"{level.World}-{indexInWorld}  {Loc.T(level.Title)}";
             var best = App.Progress.Levels.TryGetValue(level.Number, out var r) ? r.BestTime : 0;
-            _levelBest.text = !App.Progress.IsUnlocked(level.Number) ? "Locked: finish the level before it"
-                : best > 0 ? $"Best {Ui.Time(best)}   Par {Ui.Time(level.ParTime)}" : $"Par {Ui.Time(level.ParTime)}";
+            _levelBest.text = !App.Progress.IsUnlocked(level.Number) ? Loc.T("Locked: finish the level before it")
+                : best > 0 ? Loc.T("Best {0}   Par {1}", Ui.Time(best), Ui.Time(level.ParTime)) : Loc.T("Par {0}", Ui.Time(level.ParTime));
         }
 
         public void Tick()

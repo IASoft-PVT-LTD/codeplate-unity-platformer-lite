@@ -1,11 +1,12 @@
 # level 4 Clockface Climb: autopilot run, 13.3 s, 0 deaths
+# moves: dash
 1 .
 206 R
 44 .
 8 R
 4 .
-30 RJ
-30 R
+27 RJ
+33 R
 18 RJ
 156 R
 18 RJ
@@ -13,13 +14,13 @@
 1 .
 6 L
 3 .
-30 RJ
-14 R
+27 RJ
+17 R
 3 .
 1 R
 1 .
-30 RJ
-51 R
+27 RJ
+54 R
 18 RJ
 8 R
 42 L

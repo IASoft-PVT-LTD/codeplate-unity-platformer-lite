@@ -14,6 +14,7 @@
     "replay": "node tools/unity.mjs replay",
     "autoplay": "node tools/unity.mjs autoplay",
     "feel": "node tools/unity.mjs feel",
+    "art": "node tools/art.mjs",
     "build:web": "node tools/unity.mjs build web",
     "build:windows": "node tools/unity.mjs build windows",
     "build:macos": "node tools/unity.mjs build macos"

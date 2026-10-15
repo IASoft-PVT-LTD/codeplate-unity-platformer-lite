@@ -273,6 +273,16 @@
       "credit": "CodePlate"
     },
     {
+      "path": "Assets/Resources/Art/pickups/clock.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Clock pickup ('o', adds timeBonus seconds to the level clock): a brass pocket watch, the minute hand ticking round, 4 frames at 6 fps",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
       "path": "Assets/Resources/Art/pickups/coin.png",
       "kind": "image",
       "width": 16,
@@ -454,6 +464,105 @@
       "credit": "CodePlate"
     },
     {
+      "path": "Assets/Resources/Art/ui/dpad_corner.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad corner marker (24x24, used for all four diagonals): faint ring",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_corner_lit.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad corner marker while that diagonal is held: brass dot",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_down.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, down arm (24x24, one cell of the 3x3 pad; TouchControls sizes the cells): translucent plate, cream rim, white arrow",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_down_lit.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, down arm held (brass plate)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_hub.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad centre cell (24x24) with a round recess: the dead zone",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_left.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, left arm (24x24, one cell of the 3x3 pad; TouchControls sizes the cells): translucent plate, cream rim, white arrow",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_left_lit.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, left arm held (brass plate)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_right.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, right arm (24x24, one cell of the 3x3 pad; TouchControls sizes the cells): translucent plate, cream rim, white arrow",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_right_lit.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, right arm held (brass plate)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_up.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, up arm (24x24, one cell of the 3x3 pad; TouchControls sizes the cells): translucent plate, cream rim, white arrow",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/dpad_up_lit.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Touch d-pad, up arm held (brass plate)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
       "path": "Assets/Resources/Art/ui/font.ttf",
       "kind": "font",
       "use": "Pixel font 'Sprocket Pixel' (ASCII 32-126 plus • and ×): 8 px per em, cap height 7 px, descender 2 px, digits monospaced; use font size 8 (or a multiple) with point filtering for crisp pixels",
@@ -587,29 +696,11 @@
       "credit": "CodePlate"
     },
     {
-      "path": "Assets/Resources/Art/ui/touch_left.png",
-      "kind": "image",
-      "width": 48,
-      "height": 48,
-      "use": "Touch control: move left (round translucent button, white arrow)",
-      "license": "CodePlate-original",
-      "credit": "CodePlate"
-    },
-    {
       "path": "Assets/Resources/Art/ui/touch_pause.png",
       "kind": "image",
       "width": 48,
       "height": 48,
       "use": "Touch control: pause (round translucent button, pause bars)",
-      "license": "CodePlate-original",
-      "credit": "CodePlate"
-    },
-    {
-      "path": "Assets/Resources/Art/ui/touch_right.png",
-      "kind": "image",
-      "width": 48,
-      "height": 48,
-      "use": "Touch control: move right (round translucent button, white arrow)",
       "license": "CodePlate-original",
       "credit": "CodePlate"
     },
@@ -666,6 +757,13 @@
       "path": "Assets/Resources/Audio/click.wav",
       "kind": "audio",
       "use": "UI button press / move (tick)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/clock.wav",
+      "kind": "audio",
+      "use": "Clock pickup collected (adds time to the level clock): a tick, a tock and a bright two-note chime",
       "license": "CodePlate-original",
       "credit": "CodePlate"
     },

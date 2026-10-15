@@ -1,4 +1,5 @@
 # level 3 Piston Run: autopilot run, 32.2 s, 0 deaths
+# moves: dash
 1 .
 30 R
 18 RJ
@@ -8,26 +9,26 @@
 1 RX
 37 R
 387 .
-30 RJ
-37 R
+27 RJ
+40 R
 3 .
 1 R
 1 .
-30 RJ
-12 R
+27 RJ
+15 R
 9 L
 3 .
 1 R
 1 .
-30 RJ
-1 R
+27 RJ
+4 R
 4 .
 21 RJ
 1 RX
 20 R
 4 .
-30 RJ
-29 R
+27 RJ
+32 R
 4 .
 21 RJ
 1 RX
@@ -35,8 +36,8 @@
 3 .
 1 R
 1 .
-30 RJ
-12 R
+27 RJ
+15 R
 18 RJ
 21 R
 2 .
@@ -46,11 +47,11 @@
 1 RX
 36 R
 286 .
-30 RJ
-83 R
+27 RJ
+86 R
 4 .
-30 RJ
-14 R
+27 RJ
+17 R
 1 .
 1 R
 3 .

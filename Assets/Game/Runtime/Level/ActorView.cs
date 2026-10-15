@@ -26,6 +26,7 @@ namespace Game.Runtime
             ["coin"] = new Dictionary<string, string> { ["*"] = "pickups/coin" },
             ["gem"] = new Dictionary<string, string> { ["*"] = "pickups/gem" },
             ["heart"] = new Dictionary<string, string> { ["*"] = "pickups/heart" },
+            ["clock"] = new Dictionary<string, string> { ["*"] = "pickups/clock" },
             ["checkpoint"] = new Dictionary<string, string> { ["*"] = "markers/checkpoint" },
             ["goal"] = new Dictionary<string, string> { ["*"] = "markers/goal" },
             ["beetle"] = new Dictionary<string, string>

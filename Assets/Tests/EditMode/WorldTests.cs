@@ -102,7 +102,7 @@ namespace Game.Tests
         }
 
         [Test]
-        public void SpikesHurtAndPitsKill()
+        public void SpikesHurtAndPitsCostAHeart()
         {
             var w = Kit.Room(
                 "..........",
@@ -115,29 +115,37 @@ namespace Game.Tests
             Assert.AreEqual(w.Config.maxHealth - 1, w.Player.Health);
             for (int t = 0; t < 400 && !ev.Has(SimEventType.Die); t++) ev = w.Run(Right, 1);
             Assert.IsTrue(ev.Has(SimEventType.Die), "the pit kills");
+            Assert.AreEqual(w.Config.maxHealth - 2, w.Player.Health, "the fall cost a heart too");
             ev = w.Run(0, GameConfig.Ticks(w.Config.respawnDelay) + 1);
             Assert.IsTrue(ev.Has(SimEventType.Respawn));
             Assert.AreEqual(1, w.Deaths);
-            Assert.AreEqual(w.Config.maxHealth, w.Player.Health, "respawn with full health");
+            Assert.AreEqual(w.Config.maxHealth - 2, w.Player.Health, "respawn keeps the hearts left: no refill");
+            Assert.IsFalse(w.OutOfHearts);
         }
 
         [Test]
         public void PickupsCountOnceAndGemsSurviveDeath()
         {
+            // A heart heals one (up to the most), then a fall costs one; respawn is at the checkpoint.
             var w = Kit.Room(
                 "....................",
-                "..P.cc*h.C...^^^^^^^",
-                "####################");
+                "..P.cc*h.C..........",
+                "#############.....##");
             w.Settle();
             w.Player.Health = 1;
             var ev = w.Run(Right, 55);
             Assert.AreEqual(2, w.Coins);
             Assert.IsTrue(w.Gems[0]);
             Assert.AreEqual(1, ev.Count(SimEventType.Heart));
+            Assert.AreEqual(2, w.Player.Health, "the heart healed one");
             Assert.IsTrue(ev.Has(SimEventType.Checkpoint));
-            ev = w.Run(Right, 200);
-            Assert.IsTrue(ev.Has(SimEventType.Die));
+            for (int t = 0; t < 200 && !ev.Has(SimEventType.Die); t++) ev = w.Run(Right, 1);
+            Assert.IsTrue(ev.Has(SimEventType.Die), "into the pit");
+            ev = w.Run(0, GameConfig.Ticks(w.Config.respawnDelay) + 1);
+            Assert.IsTrue(ev.Has(SimEventType.Respawn));
             Assert.AreEqual(9.5, w.Checkpoint.X, 1e-9);
+            Assert.AreEqual(9.5, w.Player.Body.Pos.X, 1e-9, "back at the checkpoint");
+            Assert.AreEqual(1, w.Player.Health, "the fall cost the healed heart");
             Assert.IsTrue(w.Gems[0], "a found gem stays found after dying");
             Assert.AreEqual(2, w.Coins);
         }
@@ -154,6 +162,7 @@ namespace Game.Tests
             w.Settle();
             var ev = w.Run(Right, 30);
             Assert.IsTrue(ev.Has(SimEventType.Die));
+            Assert.IsTrue(ev.Has(SimEventType.OutOfHearts), "one hit, no hearts left: the level is failed");
         }
 
         [Test]

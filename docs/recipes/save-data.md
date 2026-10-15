@@ -2,7 +2,7 @@
 
 Use this when something new must be remembered between plays (keys, unlocked skins, achievements, a new setting), or a saved field changes meaning.
 
-Saves are `progress.json` in `Application.persistentDataPath` (on the web: the browser's storage). `Game.Core.Progress` turns it to and from JSON and owns the format; `Game.Runtime.SaveStore` only reads and writes the file. A broken or newer file never crashes the game: it starts fresh and logs a warning.
+Saves are `progress.json` in `Application.persistentDataPath` (on the web: the browser's storage, IndexedDB, through `autoSyncPersistentDataPath: true` in `Assets/WebGLTemplates/Game/index.html`; without it a reload loses everything). `Game.Core.Progress` turns it to and from JSON and owns the format; `Game.Runtime.SaveStore` only reads and writes the file. A broken or newer file never crashes the game: it starts fresh and logs a warning.
 
 ## Add a field (no version bump needed)
 

@@ -66,7 +66,7 @@ namespace Game.Runtime
         public static int ZoomOverride;
 
         /// <summary>The whole-number scale that fits the reference resolution on screen.</summary>
-        public int Zoom() => ZoomOverride > 0 ? ZoomOverride : Mathf.Max(1, Mathf.Min(Screen.width / _viewW, Screen.height / _viewH));
+        public int Zoom() => ZoomOverride > 0 ? ZoomOverride : Game.Core.TouchLayout.Zoom(Screen.width, Screen.height, _viewW, _viewH);
 
         void Update()
         {
@@ -165,6 +165,28 @@ namespace Game.Runtime
         }
 
         public void OpenSettings() => Open(new SettingsScreen());
+
+        /// <summary>
+        /// Switches the language (Settings' Language button), saves it, and builds the screens on
+        /// show again in it: the title or map underneath, then each open overlay. A level's HUD
+        /// keeps its labels until the next level starts; its messages switch at once.
+        /// </summary>
+        public void ChangeLanguage(string code)
+        {
+            App.Progress.Settings.Language = Game.Core.Loc.Use(code);
+            App.Save();
+            var open = new List<IScreen>(_stack);
+            if (_menu is TitleScreen) SetMenu(new TitleScreen(), 1);
+            else if (_menu is WorldMapScreen map) SetMenu(new WorldMapScreen(map.World), map.World);
+            else CloseAll();
+            foreach (var s in open)
+            {
+                if (s is SettingsScreen) OpenSettings();
+                else if (s is CreditsScreen) OpenCredits();
+                else if (s is PauseMenu && App.Level != null) Open(new PauseMenu(App.Level));
+                else Open(s);
+            }
+        }
         public void OpenCredits() => Open(new CreditsScreen());
     }
 }

@@ -14,7 +14,9 @@ namespace Game.Core
     /// 9 RJ
     /// </code>
     /// Replays live in replays/level_NN.replay (next to Assets/). You can edit them by hand
-    /// ("hold jump 3 ticks longer at line 14").
+    /// ("hold jump 3 ticks longer at line 14"). The "# moves:" line names the moves that were on
+    /// when the run was recorded (<see cref="Moves"/>); when a replay stops finishing after a move
+    /// was switched on, <see cref="MovesNote"/> says so.
     /// </summary>
     public static class Replay
     {
@@ -38,10 +40,11 @@ namespace Game.Core
             return output;
         }
 
-        public static string ToText(IReadOnlyList<int> inputs, string comment = "")
+        public static string ToText(IReadOnlyList<int> inputs, string comment = "", string moves = null)
         {
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(comment)) sb.Append("# ").Append(comment).Append('\n');
+            if (moves != null) sb.Append(MovesHeader).Append(' ').Append(moves).Append('\n');
             int i = 0;
             while (i < inputs.Count)
             {
@@ -53,6 +56,57 @@ namespace Game.Core
             return sb.ToString();
         }
 
+        public const string MovesHeader = "# moves:";
+
+        /// <summary>
+        /// The optional moves switched on in <paramref name="c"/>, as the "# moves:" line writes
+        /// them: "dash double_jump wall_jump", or "none". A new move with an ...Enabled switch
+        /// belongs here too (docs/recipes/add-ability.md).
+        /// </summary>
+        public static string Moves(GameConfig c)
+        {
+            var on = new List<string>();
+            if (c.dashEnabled) on.Add("dash");
+            if (c.doubleJumpEnabled) on.Add("double_jump");
+            if (c.wallJumpEnabled) on.Add("wall_jump");
+            return on.Count == 0 ? "none" : string.Join(" ", on);
+        }
+
+        /// <summary>The moves a replay's "# moves:" line names (empty for "none"), or null when it has no such line.</summary>
+        public static List<string> RecordedMoves(string text)
+        {
+            foreach (var raw in (text ?? "").Replace("\r\n", "\n").Split('\n'))
+            {
+                string l = raw.Trim();
+                if (!l.StartsWith(MovesHeader)) continue;
+                var moves = new List<string>(l.Substring(MovesHeader.Length).Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries));
+                moves.Remove("none");
+                return moves;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Why a replay that no longer finishes may have stopped working: the moves on now differ
+        /// from the ones it was recorded with (a recorded run can hold jump or press dash where a
+        /// new move reacts to it). Empty when they match.
+        /// </summary>
+        public static string MovesNote(string text, GameConfig c, string name = "this replay")
+        {
+            var recorded = RecordedMoves(text);
+            var now = new List<string>(Moves(c).Split(' '));
+            now.Remove("none");
+            if (recorded == null)
+                return $"{name} has no \"{MovesHeader}\" line, so it may have been recorded with other moves switched on (now: {Moves(c)}).";
+            var added = now.FindAll(m => !recorded.Contains(m));
+            var removed = recorded.FindAll(m => !now.Contains(m));
+            if (added.Count == 0 && removed.Count == 0) return "";
+            var parts = new List<string>();
+            if (added.Count > 0) parts.Add($"was recorded before {string.Join(", ", added)} was switched on");
+            if (removed.Count > 0) parts.Add($"was recorded with {string.Join(", ", removed)} on, which is now off");
+            return $"{name} {string.Join(" and ", parts)} (its header says \"{MovesHeader} {(recorded.Count == 0 ? "none" : string.Join(" ", recorded))}\"): record it again.";
+        }
+
         /// <summary>The result of playing a replay: did it finish, and how.</summary>
         public sealed class Outcome
         {
@@ -62,6 +116,14 @@ namespace Game.Core
             public int Coins;
             public int Gems;
             public bool BossesDefeated;
+            /// <summary>The run lost its last heart (a failed level: a replay must never do that).</summary>
+            public bool OutOfHearts;
+            /// <summary>Times the level clock ran out during the run.</summary>
+            public int TimeUps;
+            /// <summary>Hearts left at the end.</summary>
+            public int Hearts;
+            /// <summary>The tick each checkpoint was reached on, in order.</summary>
+            public List<int> CheckpointTicks = new List<int>();
             public World World;
             /// <summary>Every enemy in the level (left to right) and whether the run met and defeated it.</summary>
             public List<Encounter> Enemies = new List<Encounter>();
@@ -79,7 +141,8 @@ namespace Game.Core
             }
 
             public override string ToString() =>
-                $"{(Finished ? "finished" : "did NOT finish")} at tick {Ticks} ({Ticks / 60.0:0.0} s), deaths {Deaths}, coins {Coins}, gems {Gems}/3" +
+                $"{(Finished ? "finished" : "did NOT finish")} at tick {Ticks} ({Ticks / 60.0:0.0} s), deaths {Deaths}, hearts left {Hearts}, coins {Coins}, gems {Gems}/3" +
+                (OutOfHearts ? ", OUT OF HEARTS" : "") + (TimeUps > 0 ? $", time ran out {TimeUps}x" : "") +
                 (World != null && World.Bosses.Count > 0 ? $", boss {(BossesDefeated ? "defeated" : "NOT defeated")}" : "") +
                 (World != null && !Finished ? $"; player at {World.Player.Body.Pos}, {World.Player.Current}" : "");
         }
@@ -96,16 +159,23 @@ namespace Game.Core
         {
             var w = new World(level, config, enemies);
             var log = new EnemyLog(w, near);
-            for (int i = 0; i < inputs.Count + extraTicks && !w.Finished; i++)
+            int timeUps = 0;
+            var checkpoints = new List<int>();
+            for (int i = 0; i < inputs.Count + extraTicks && !w.Finished && !w.OutOfHearts; i++)
             {
-                w.Step(i < inputs.Count ? inputs[i] : 0);
+                foreach (var e in w.Step(i < inputs.Count ? inputs[i] : 0))
+                {
+                    if (e.Type == SimEventType.TimeUp) timeUps++;
+                    if (e.Type == SimEventType.Checkpoint) checkpoints.Add(w.Tick);
+                }
                 log.Observe();
             }
             int gems = 0;
             foreach (bool g in w.Gems) if (g) gems++;
             bool bosses = true;
             foreach (var b in w.Bosses) bosses &= b.Defeated;
-            return new Outcome { Finished = w.Finished, Ticks = w.Tick, Deaths = w.Deaths, Coins = w.Coins, Gems = gems, BossesDefeated = bosses, World = w, Enemies = log.Encounters };
+            return new Outcome { Finished = w.Finished, Ticks = w.Tick, Deaths = w.Deaths, Coins = w.Coins, Gems = gems, BossesDefeated = bosses, World = w, Enemies = log.Encounters,
+                OutOfHearts = w.OutOfHearts, TimeUps = timeUps, Hearts = w.Player.Health, CheckpointTicks = checkpoints };
         }
 
         /// <summary>One enemy of the level, and what a run did with it.</summary>

@@ -5,7 +5,7 @@ using System.Text;
 namespace Game.Core
 {
     /// <summary>
-    /// The level linter: can the player get from the start to every gem, checkpoint and the goal
+    /// The level linter: can the player get from the start to every gem, checkpoint, clock pickup and the goal
     /// with the CURRENT movement settings? Pure logic.
     ///
     /// How: jump, fall and dash paths are recorded by running the real Player in empty space
@@ -86,6 +86,7 @@ namespace Game.Core
                 {
                     case "gem":
                     case "checkpoint":
+                    case "clock": // a clock pickup out of reach would promise time the player can't get
                     case "goal":
                         r.Targets.Add((a.Kind, cell));
                         targetCells.Add(cell);
@@ -421,7 +422,7 @@ namespace Game.Core
                 sb.Append('\n');
             }
             sb.Append(r.Missing.Count == 0
-                ? $"all {r.Targets.Count} targets (gems, checkpoints, goal) are reachable\n"
+                ? $"all {r.Targets.Count} targets (gems, checkpoints, clocks, goal) are reachable\n"
                 : $"{r.Missing.Count} of {r.Targets.Count} targets are NOT reachable:\n");
             foreach (var m in r.Missing) sb.Append($"  {m.Kind} at {m.Cell.X},{m.Cell.Y} (column {m.Cell.X}, row {m.Cell.Y})\n");
             return sb.ToString();

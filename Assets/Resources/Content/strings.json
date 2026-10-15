@@ -1,0 +1,7 @@
+{
+  "_comment": "The game's texts in other languages (Game.Core Loc, docs/recipes/add-language.md). languages: each language's code and its own name, English first; Settings shows a Language button once there are two. texts: one table per language other than English, from the English text (as it appears in the UXML files, Loc.T(\"...\") calls, worlds.json and the level titles) to the translation. A text a table lacks is shown in English; npm run check lists every missing one.",
+  "languages": {
+    "en": "English"
+  },
+  "texts": {}
+}
