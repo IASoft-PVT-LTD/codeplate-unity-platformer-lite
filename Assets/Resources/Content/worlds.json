@@ -1,0 +1,6 @@
+{
+  "_comment": "One entry per world: its map page, art set (Art/tiles/terrain_w<id>.png, Art/bg/w<id>_*.png) and music (Audio/<music>.wav).",
+  "worlds": [
+    {"id": 1, "name": "The Gearworks", "subtitle": "Brass halls at the foot of the tower", "music": "music_world1", "bossMusic": "music_boss", "accent": "#f2b544", "sky": "#2b1d14"}
+  ]
+}

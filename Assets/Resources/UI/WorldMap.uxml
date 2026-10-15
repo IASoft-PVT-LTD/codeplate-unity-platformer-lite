@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- The world map: one page per world. WorldMapScreen.cs places the level nodes in #map-area. -->
+    <ui:VisualElement name="world-map" class="screen">
+        <ui:VisualElement name="map-area" class="map-area" />
+        <ui:VisualElement class="map-header" picking-mode="Ignore">
+            <ui:Label name="world-name" class="map-title" text="World" />
+            <ui:Label name="world-subtitle" class="map-subtitle" text="" />
+        </ui:VisualElement>
+        <ui:VisualElement class="map-info" picking-mode="Ignore">
+            <ui:Label name="level-name" class="map-level-name" text="" />
+            <ui:Label name="level-best" class="hint" text="" />
+        </ui:VisualElement>
+        <ui:VisualElement class="map-footer">
+            <ui:Button name="back" text="Back" style="min-width: 54px;" />
+            <ui:VisualElement class="spacer" />
+            <ui:Label name="gem-total" class="hud-text" text="" />
+            <ui:VisualElement class="spacer" />
+            <ui:Button name="prev-world" text="&lt;" class="page-btn" />
+            <ui:Button name="next-world" text="&gt;" class="page-btn" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

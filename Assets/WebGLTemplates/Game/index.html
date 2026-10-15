@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <!--
+      The web page around the game (npm run build:web; docs/recipes/builds.md). The game fills the
+      window; a bar shows loading; on a phone held upright a small card asks to turn it sideways
+      (the game is landscape). Colors match Assets/Resources/UI/Game.uss: change them with the palette.
+    -->
+    <style>
+      :root {
+        --ink: #1a120c;
+        --panel: #2b1f17;
+        --brass: #f2b544;
+        --brass-dark: #a8692a;
+        --cream: #fbefd5;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--ink);
+        color: var(--cream);
+        font: bold 14px/1.3 ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #game {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        outline: none;
+        touch-action: none;
+        background: var(--ink);
+      }
+      .card {
+        background: var(--panel);
+        border: 2px solid var(--brass);
+        box-shadow: 0 0 0 2px var(--ink), 4px 4px 0 2px rgba(0, 0, 0, 0.45);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      #loading {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(240px, 70vw);
+        padding: 10px 12px;
+        text-align: center;
+      }
+      #loading .bar {
+        margin-top: 8px;
+        height: 8px;
+        background: var(--ink);
+        border: 2px solid var(--brass-dark);
+      }
+      #loading .fill {
+        width: 0;
+        height: 100%;
+        background: var(--brass);
+      }
+      #turn {
+        display: none;
+        position: fixed;
+        left: 50%;
+        top: max(16px, env(safe-area-inset-top));
+        transform: translateX(-50%);
+        z-index: 10;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      #turn .phone {
+        flex: none;
+        width: 14px;
+        height: 24px;
+        border: 2px solid var(--brass);
+        border-radius: 3px;
+        box-sizing: border-box;
+        position: relative;
+        animation: turn 2.4s steps(1, end) infinite;
+      }
+      #turn .phone::after {
+        content: "";
+        position: absolute;
+        left: 3px;
+        right: 3px;
+        bottom: 2px;
+        height: 2px;
+        background: var(--brass);
+      }
+      @keyframes turn {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(-90deg); }
+      }
+      /* A phone (or tablet) held upright: the game is landscape, so ask to turn it. */
+      @media (orientation: portrait) and (hover: none) and (pointer: coarse) {
+        #turn { display: flex; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #turn .phone { animation: none; transform: rotate(-90deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="game" width="{{{ WIDTH }}}" height="{{{ HEIGHT }}}" tabindex="-1"></canvas>
+    <div id="loading" class="card">Loading<div class="bar"><div class="fill"></div></div></div>
+    <div id="turn" class="card" role="status"><div class="phone"></div>Turn your phone sideways</div>
+    <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+    <script>
+      var canvas = document.getElementById("game");
+      var loading = document.getElementById("loading");
+      var fill = loading.querySelector(".fill");
+      createUnityInstance(canvas, {
+#if PROGRESSIVE_ASSET_LOADING
+        primaryDataUrls: {{{ JSON.stringify(PRIMARY_DATA_FILES) }}},
+        secondaryDataUrls: {{{ JSON.stringify(SECONDARY_DATA_FILES) }}},
+#else
+        dataUrl: "Build/{{{ DATA_FILENAME }}}",
+#endif
+        frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_WASM
+        codeUrl: "Build/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      }, function (progress) {
+        fill.style.width = Math.round(progress * 100) + "%";
+      }).then(function (instance) {
+        loading.style.display = "none";
+        canvas.focus();
+      }).catch(function (message) {
+        loading.textContent = "The game couldn't start: " + message;
+      });
+    </script>
+  </body>
+</html>

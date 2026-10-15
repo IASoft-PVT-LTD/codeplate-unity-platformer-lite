@@ -1,0 +1,22 @@
+{
+  "_comment": "What each map character means. tile: a TileGrid flag (solid, one_way, spikes, crumble, dash_wall). actor: a class in LevelData.ActorTypes. See docs/levels.md.",
+  ".": {"name": "empty"},
+  "#": {"name": "ground (the level's world terrain)", "tile": "solid"},
+  "=": {"name": "one-way ledge", "tile": "one_way"},
+  "^": {"name": "spikes", "tile": "spikes"},
+  "x": {"name": "crumbling block", "tile": "crumble"},
+  "d": {"name": "dash wall (a dash breaks it)", "tile": "dash_wall"},
+  "P": {"name": "player start (exactly one)", "special": "start"},
+  "G": {"name": "goal (exactly one; opens when every boss is defeated)", "actor": "goal"},
+  "C": {"name": "checkpoint", "actor": "checkpoint"},
+  "c": {"name": "coin", "actor": "coin"},
+  "*": {"name": "gem (exactly 3 per level)", "actor": "gem"},
+  "h": {"name": "heart", "actor": "heart"},
+  "s": {"name": "spring", "actor": "spring"},
+  "-": {"name": "moving platform (params: dx dy speed w wait)", "actor": "platform"},
+  "w": {"name": "walker", "actor": "walker"},
+  "f": {"name": "flyer (params: range speed amp)", "actor": "flyer"},
+  "k": {"name": "spiker (don't stomp it)", "actor": "spiker"},
+  "t": {"name": "shooter (params: dir interval delay)", "actor": "shooter"},
+  "B": {"name": "boss (needs an at line: type=beetle; optional name= health=)", "actor": "boss"}
+}

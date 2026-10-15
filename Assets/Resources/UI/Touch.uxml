@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- On-screen buttons for touch screens. Positions and art: Game.uss (#touch-*). Logic: TouchControls.cs. -->
+    <ui:VisualElement name="touch" class="touch" picking-mode="Ignore">
+        <ui:VisualElement name="touch-left" class="touch-btn" />
+        <ui:VisualElement name="touch-right" class="touch-btn" />
+        <ui:VisualElement name="touch-dash" class="touch-btn" />
+        <ui:VisualElement name="touch-jump" class="touch-btn" />
+        <ui:VisualElement name="touch-pause" class="touch-btn" />
+    </ui:VisualElement>
+</ui:UXML>

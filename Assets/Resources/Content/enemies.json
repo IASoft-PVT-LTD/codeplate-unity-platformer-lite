@@ -1,0 +1,15 @@
+{
+  "_comment": "Enemy and boss numbers (tiles, seconds). EnemyConfig.cs documents each key. Per-phase lists are indexed by hits taken (0, 1, 2).",
+  "walker": {"speed": 2.0, "size": [0.8, 0.75]},
+  "spiker": {"speed": 1.6, "size": [0.8, 0.75]},
+  "flyer": {"speed": 1.5, "range": 3.0, "amplitude": 1.5, "period": 2.0, "size": [0.8, 0.7]},
+  "shooter": {
+    "interval": 2.4, "windup": 0.5, "projectileSpeed": 4.5, "projectileRange": 16.0,
+    "projectileSize": [0.45, 0.45], "wakeDistance": 14.0, "size": [0.9, 0.9]
+  },
+  "beetle": {
+    "health": 3, "size": [2.25, 1.4], "wakeDistance": 11.0,
+    "chargeSpeed": [9.0, 11.0, 13.0], "stunTime": [1.8, 1.5, 1.2],
+    "idleTime": 0.7, "telegraphTime": 0.6
+  }
+}

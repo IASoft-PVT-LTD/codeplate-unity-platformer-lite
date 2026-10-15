@@ -1,0 +1,9 @@
+SPROCKET
+
+Built with CodePlate (codeplate.io).
+
+Art, sound effects, music and font: original placeholders generated for the template. Free to ship.
+
+Built with Unity.
+
+Thanks for playing!

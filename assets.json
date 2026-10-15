@@ -1,0 +1,813 @@
+{
+  "$schema": "https://codeplate.io/schema/assets-0.json",
+  "assets": [
+    {
+      "path": "Assets/Resources/Art/bg/w1_far.png",
+      "kind": "image",
+      "width": 480,
+      "height": 270,
+      "use": "World 1 far layer, 480x270 transparent, tiles horizontally: low-contrast towers and gears; parallax ~0.25",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/bg/w1_near.png",
+      "kind": "image",
+      "width": 480,
+      "height": 270,
+      "use": "World 1 near layer, 480x270 transparent, tiles horizontally: dark gears, girders and pipes; parallax ~0.5",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/bg/w1_sky.png",
+      "kind": "image",
+      "width": 480,
+      "height": 270,
+      "use": "World 1 sky, 480x270 opaque: warm dusk with a giant distant clock face and gears; static (parallax 0)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/blocks/crumble.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 3,
+      "use": "Crumbling block: intact, cracked, very cracked; step through the frames while it is stood on, then it falls",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/blocks/dash_wall.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Dash wall: cracked red-oxide plate with a bolt emblem; a dash breaks it (spawn debris fx)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/blocks/one_way.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 3,
+      "use": "One-way brass girder: left end, middle, right end; art in the top 5 rows; the player jumps up through it",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/blocks/platform.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 3,
+      "use": "Moving platform plate: left, middle, right; art in the top 6 rows of the tile",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/blocks/spikes.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Floor spikes (art in the bottom half of the tile); touching them hurts",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/blocks/spring.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 2,
+      "use": "Spring: frame 0 compressed (idle), frame 1 extended while launching the player (~0.2 s)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/bosses/beetle_charge.png",
+      "kind": "image",
+      "width": 48,
+      "height": 32,
+      "frames": 4,
+      "use": "Beetle boss charge loop, 4 frames at 12 fps: head down, legs running, dust behind",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/bosses/beetle_hurt.png",
+      "kind": "image",
+      "width": 48,
+      "height": 32,
+      "use": "Beetle boss hit (1 white-flash frame); show ~0.15 s after each hit",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/bosses/beetle_idle.png",
+      "kind": "image",
+      "width": 48,
+      "height": 32,
+      "frames": 2,
+      "use": "Beetle boss idle/telegraph loop, 2 frames at 4 fps (48x32, horn faces right, hitbox ~36x22 at the bottom centre)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/bosses/beetle_stunned.png",
+      "kind": "image",
+      "width": 48,
+      "height": 32,
+      "frames": 2,
+      "use": "Beetle boss stunned after hitting a wall, 2 frames at 4 fps (dizzy eye, circling stars); stompable",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/flyer_fly.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Flyer (propeller drone) hover loop, 4 frames at 12 fps, faces right (red lens); safe to stomp",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/flyer_squashed.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Flyer after being stomped (show ~0.4 s, then despawn)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/projectile.png",
+      "kind": "image",
+      "width": 8,
+      "height": 8,
+      "frames": 2,
+      "use": "Shooter's glowing bolt, 2 frames at 12 fps (8x8, centred on the hitbox); tail on the left, flip when moving left",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/shooter.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Shooter (steam turret), barrel points right: frames 0-1 idle loop at 4 fps, frames 2-3 charge loop (glowing barrel) during the windup before a shot",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/shooter_squashed.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Shooter after being stomped (broken turret; show ~0.4 s, then despawn)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/spiker_walk.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Spiker (spiked gear crawler) walk cycle, 4 frames at 8 fps, faces right; spikes on top: stomping it hurts the player",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/walker_squashed.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Walker after being stomped (show ~0.4 s, then despawn)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/enemies/walker_walk.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Walker (clockwork beetle-mite) walk cycle, 4 frames at 8 fps, faces right, feet on the bottom row; safe to stomp",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/fx/debris.png",
+      "kind": "image",
+      "width": 8,
+      "height": 8,
+      "frames": 4,
+      "use": "Metal shard; spawn several with random velocity and pick a frame each (or spin through them at 12 fps) when walls/blocks break",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/fx/dust.png",
+      "kind": "image",
+      "width": 8,
+      "height": 8,
+      "frames": 4,
+      "use": "Dust puff for landings, run starts and skids, 4 frames at 14 fps, play once",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/fx/pop.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Expanding ring for stomps and collected items, 4 frames at 16 fps, play once",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/fx/sparkle.png",
+      "kind": "image",
+      "width": 8,
+      "height": 8,
+      "frames": 4,
+      "use": "Sparkle for pickups and checkpoints, 4 frames at 14 fps, play once",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/fx/steam.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Steam puff (vents, dash), 4 frames at 10 fps, play once while drifting up",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/markers/checkpoint.png",
+      "kind": "image",
+      "width": 16,
+      "height": 32,
+      "frames": 3,
+      "use": "Checkpoint lamp post (16x32, base on the bottom row): 0 off, 1 lighting (play ~0.2 s), 2 on (stays)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/markers/goal.png",
+      "kind": "image",
+      "width": 32,
+      "height": 48,
+      "frames": 2,
+      "use": "Level goal tower door (32x48, base on the bottom row): 0 closed and locked (a boss still alive), 1 open and glowing",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/pickups/coin.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 6,
+      "use": "Spinning brass gear-coin loop, 6 frames at 10 fps",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/pickups/gem.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "use": "Sparkling gem loop (3 per level), 4 frames at 6 fps",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/pickups/heart.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 2,
+      "use": "Heart pickup (restores 1 health), 2-frame pulse at 3 fps",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/dash.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "frames": 2,
+      "use": "Player dash, 2 frames at 16 fps: stretched body with motion lines trailing to the left (flip with the sprite)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/fall.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "frames": 2,
+      "use": "Player falling, 2 frames at 8 fps, legs dangling; show while vertical speed is downward",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/hurt.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "frames": 2,
+      "use": "Player hit, 2 frames at 10 fps (white flash, then X eye); play once on damage",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/idle.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "frames": 4,
+      "use": "Player idle loop, 4 frames at 6 fps: subtle 1 px bob while the wind-up key turns; facing right, feet on the bottom row",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/jump.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Player rising (1 frame): stretched, legs tucked; show while vertical speed is upward",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/land.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "frames": 2,
+      "use": "Player landing squash, 2 frames at 16 fps; play once on touchdown, then idle/run",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/run.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "frames": 6,
+      "use": "Player run cycle, 6 frames at 14 fps, facing right, feet on the bottom row",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/player/wall_slide.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "Player sliding down a wall that is on its RIGHT (hand and sparks on the right edge); flip for a left wall",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/tiles/terrain_w1.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "frames": 16,
+      "use": "World 1 solid terrain autotile (Gearworks bricks with a brass-trimmed lit top edge). Frame = N*1 + E*2 + S*4 + W*8, a bit set when that neighbour is also solid (frame 0 isolated block, 15 interior); tiles seamlessly",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/boss_node_done.png",
+      "kind": "image",
+      "width": 32,
+      "height": 32,
+      "use": "World-map boss marker, defeated (brass gear, green check badge)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/boss_node_locked.png",
+      "kind": "image",
+      "width": 32,
+      "height": 32,
+      "use": "World-map boss marker, locked (grey gear and skull)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/boss_node_open.png",
+      "kind": "image",
+      "width": 32,
+      "height": 32,
+      "use": "World-map boss marker, playable (copper gear, skull with red eyes)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/button.png",
+      "kind": "image",
+      "width": 48,
+      "height": 24,
+      "use": "Menu button, normal: 9-slice with 8 px borders on all sides; dark label text (#2a160e) or white with outline",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/button_focus.png",
+      "kind": "image",
+      "width": 48,
+      "height": 24,
+      "use": "Menu button, focused/hovered (brighter, cyan inner ring): 9-slice with 8 px borders",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/button_pressed.png",
+      "kind": "image",
+      "width": 48,
+      "height": 24,
+      "use": "Menu button, pressed (darker, inverted bevel; nudge the label down 1 px): 9-slice with 8 px borders",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/coin_icon.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "HUD coin counter icon",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/font.ttf",
+      "kind": "font",
+      "use": "Pixel font 'Sprocket Pixel' (ASCII 32-126 plus • and ×): 8 px per em, cap height 7 px, descender 2 px, digits monospaced; use font size 8 (or a multiple) with point filtering for crisp pixels",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/gem_empty.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "HUD/level-select gem, not yet collected (dark silhouette)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/gem_full.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "HUD/level-select gem, collected",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/heart_empty.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "HUD health heart, empty slot",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/heart_full.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "HUD health heart, full",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/icon.png",
+      "kind": "image",
+      "width": 256,
+      "height": 256,
+      "use": "Game icon, 256x256: Sprocket's face (Player Settings > Icon)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/lock.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Lock icon (locked level, locked world)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/logo.png",
+      "kind": "image",
+      "width": 288,
+      "height": 72,
+      "use": "Title logo 'SPROCKET', 288x72, brass letters with a gear O; draw at 1x (or integer scale)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/node_done.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "World-map level marker, completed (brass ring, green check)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/node_locked.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "World-map level marker, locked (iron plate with a lock)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/node_open.png",
+      "kind": "image",
+      "width": 24,
+      "height": 24,
+      "use": "World-map level marker, playable (brass ring, glowing cyan centre)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/panel.png",
+      "kind": "image",
+      "width": 48,
+      "height": 48,
+      "use": "Panel frame for menus and dialogs: 9-slice with 16 px borders on all sides; dark wood centre, brass bezel",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/pause.png",
+      "kind": "image",
+      "width": 16,
+      "height": 16,
+      "use": "Pause button icon (HUD)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/touch_dash.png",
+      "kind": "image",
+      "width": 48,
+      "height": 48,
+      "use": "Touch control: dash (round translucent button, double chevron)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/touch_jump.png",
+      "kind": "image",
+      "width": 48,
+      "height": 48,
+      "use": "Touch control: jump (round translucent button, up chevron)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/touch_left.png",
+      "kind": "image",
+      "width": 48,
+      "height": 48,
+      "use": "Touch control: move left (round translucent button, white arrow)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/touch_pause.png",
+      "kind": "image",
+      "width": 48,
+      "height": 48,
+      "use": "Touch control: pause (round translucent button, pause bars)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Art/ui/touch_right.png",
+      "kind": "image",
+      "width": 48,
+      "height": 48,
+      "use": "Touch control: move right (round translucent button, white arrow)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/air_jump.wav",
+      "kind": "audio",
+      "use": "Player's mid-air (double) jump: a higher two-step chirp with a tiny spring twang",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/boss_defeated.wav",
+      "kind": "audio",
+      "use": "A boss is defeated (falling-apart clanks, steam hiss, victory arpeggio)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/boss_hit.wav",
+      "kind": "audio",
+      "use": "The player hits a boss (bright clang)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/boss_slam.wav",
+      "kind": "audio",
+      "use": "Boss slams the ground / charges into a wall",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/boss_wake.wav",
+      "kind": "audio",
+      "use": "A boss wakes up (rumbling rise + clang, 1.4 s)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/bump.wav",
+      "kind": "audio",
+      "use": "Metallic clank: head bump, or hitting something that can't be hurt",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/checkpoint.wav",
+      "kind": "audio",
+      "use": "Checkpoint lamp lights up (rising arpeggio + bell)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/click.wav",
+      "kind": "audio",
+      "use": "UI button press / move (tick)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/coin.wav",
+      "kind": "audio",
+      "use": "Gear-coin collected (clink + two-note chime)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/crumble.wav",
+      "kind": "audio",
+      "use": "A crumbling block gives way",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/dash.wav",
+      "kind": "audio",
+      "use": "Player dashes (steam whoosh, 0.24 s)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/die.wav",
+      "kind": "audio",
+      "use": "Player loses a life (descending wind-down)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/gem.wav",
+      "kind": "audio",
+      "use": "Gem collected (sparkling five-note arpeggio)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/goal.wav",
+      "kind": "audio",
+      "use": "Level complete (fanfare)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/goal_open.wav",
+      "kind": "audio",
+      "use": "The goal door unlocks and slides open (hiss + rising tone + ding)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/heart.wav",
+      "kind": "audio",
+      "use": "Heart collected (warm two-note rise)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/hurt.wav",
+      "kind": "audio",
+      "use": "Player takes damage",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/jump.wav",
+      "kind": "audio",
+      "use": "Player jumps off the ground (rising square chirp, 0.18 s)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/land.wav",
+      "kind": "audio",
+      "use": "Player lands on the ground (soft metallic thud)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/music_boss.wav",
+      "kind": "audio",
+      "use": "Boss fight music loop: tense, driving, E minor, 152 BPM, 8 bars (12.6 s); loops seamlessly",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/music_title.wav",
+      "kind": "audio",
+      "use": "Title-screen music loop: gentle clockwork music box, F major, 84 BPM, 4 bars (11.4 s); loops seamlessly",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/music_world1.wav",
+      "kind": "audio",
+      "use": "World 1 (The Gearworks) music loop: upbeat brassy chiptune, G major, 128 BPM, 8 bars (15.0 s); loops seamlessly",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/pause.wav",
+      "kind": "audio",
+      "use": "Game paused / menu opened",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/shoot.wav",
+      "kind": "audio",
+      "use": "Steam turret fires a bolt (pfft)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/spring.wav",
+      "kind": "audio",
+      "use": "Player bounces on a spring (boing)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/stomp.wav",
+      "kind": "audio",
+      "use": "Player stomps an enemy (boing + clank)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/wall_break.wav",
+      "kind": "audio",
+      "use": "Dash wall smashes apart (metal crash)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    },
+    {
+      "path": "Assets/Resources/Audio/wall_jump.wav",
+      "kind": "audio",
+      "use": "Player kicks off a wall (scrape + rising chirp)",
+      "license": "CodePlate-original",
+      "credit": "CodePlate"
+    }
+  ]
+}

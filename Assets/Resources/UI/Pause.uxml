@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- The pause menu over a level. PauseMenu.cs wires it. -->
+    <ui:VisualElement name="pause" class="screen dim">
+        <ui:VisualElement class="panel">
+            <ui:Label class="heading" text="Paused" />
+            <ui:Label name="pause-level" class="subtle" text="" style="margin-bottom: 6px;" />
+            <ui:Button name="resume" text="Resume" />
+            <ui:Button name="restart" text="Restart" />
+            <ui:Button name="settings" text="Settings" />
+            <ui:Button name="map" text="World map" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

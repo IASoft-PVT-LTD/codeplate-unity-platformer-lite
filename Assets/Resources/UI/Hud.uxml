@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- The in-level HUD. HudView.cs fills it from the simulation every frame. -->
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <ui:VisualElement class="hud-top" picking-mode="Ignore">
+            <ui:VisualElement name="hearts" class="row" picking-mode="Ignore" />
+            <ui:VisualElement class="icon coin-icon" picking-mode="Ignore" />
+            <ui:Label name="coins" class="hud-text" text="0" picking-mode="Ignore" />
+            <ui:VisualElement class="spacer" picking-mode="Ignore" />
+            <ui:Label name="time" class="hud-text" text="0:00.0" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="gems" class="hud-gems" picking-mode="Ignore" />
+        <ui:Label name="toast" class="toast" text="" picking-mode="Ignore" />
+        <ui:VisualElement name="banner" class="banner" picking-mode="Ignore">
+            <ui:Label name="banner-small" class="banner-small" text="" picking-mode="Ignore" />
+            <ui:Label name="banner-big" class="banner-big" text="" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="boss-bar" class="boss-bar" picking-mode="Ignore">
+            <ui:Label name="boss-name" class="boss-name" text="" picking-mode="Ignore" />
+            <ui:VisualElement name="boss-pips" class="boss-pips" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,84 @@
+{
+  "_comment": "Every movement, combat, camera and feel number, in tiles and seconds. GameConfig.cs documents each key; docs/movement.md explains how they feel. Run `npm run feel` to see the derived jump numbers.",
+  "run": {
+    "runSpeed": 8.5,
+    "groundAccelTime": 0.10,
+    "groundDecelTime": 0.06,
+    "turnAccelMult": 1.8,
+    "airAccelMult": 0.65,
+    "airDecelMult": 0.35
+  },
+  "jump": {
+    "jumpHeight": 3.25,
+    "jumpMinHeight": 1.2,
+    "jumpTimeToApex": 0.36,
+    "fallGravityMult": 1.7,
+    "apexHangThreshold": 2.5,
+    "apexGravityMult": 0.5,
+    "maxFallSpeed": 18.0,
+    "fastFallSpeed": 24.0
+  },
+  "forgiveness": {
+    "coyoteTime": 0.10,
+    "jumpBufferTime": 0.12,
+    "cornerCorrection": 0.30,
+    "ledgeCorrection": 0.15
+  },
+  "dash": {
+    "dashEnabled": true,
+    "dashDistance": 3.5,
+    "dashTime": 0.14,
+    "airDashes": 1,
+    "dashCooldown": 0.25
+  },
+  "doubleJump": {
+    "doubleJumpEnabled": false,
+    "airJumps": 1,
+    "airJumpHeight": 2.4
+  },
+  "wallJump": {
+    "wallJumpEnabled": false,
+    "wallSlideSpeed": 4.0,
+    "wallJumpVelocity": [9.0, -15.5],
+    "wallJumpLockTime": 0.15,
+    "wallCoyoteTime": 0.08
+  },
+  "health": {
+    "maxHealth": 3,
+    "invulnTime": 1.0,
+    "knockback": [6.0, -9.0],
+    "respawnDelay": 0.9
+  },
+  "combat": {
+    "stompBounce": 11.0,
+    "stompBounceHeld": 17.0
+  },
+  "blocks": {
+    "springHeight": 7.0,
+    "crumbleDelay": 0.45,
+    "crumbleRespawn": 3.0
+  },
+  "body": {
+    "playerSize": [0.625, 0.875]
+  },
+  "display": {
+    "tilePx": 16,
+    "viewWidth": 480,
+    "viewHeight": 270,
+    "touchControls": "auto"
+  },
+  "camera": {
+    "camLookahead": 2.5,
+    "camDeadzone": [1.5, 2.0],
+    "camSmoothing": 8.0
+  },
+  "feel": {
+    "landSquash": 0.25,
+    "shakeHurt": 4.0,
+    "shakeStomp": 2.0,
+    "shakeDie": 6.0,
+    "shakeBoss": 5.0,
+    "hitstopStomp": 0.05,
+    "dustParticles": 6
+  }
+}

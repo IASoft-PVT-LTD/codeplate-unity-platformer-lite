@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- Settings, saved with the progress (Game.Core.Progress.SettingsData). SettingsScreen.cs wires it. -->
+    <ui:VisualElement name="settings" class="screen dim">
+        <ui:VisualElement class="panel">
+            <ui:Label class="heading" text="Settings" />
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Music" /><ui:Slider name="music" low-value="0" high-value="1" /></ui:VisualElement>
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Effects" /><ui:Slider name="sfx" low-value="0" high-value="1" /></ui:VisualElement>
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Screen shake" /><ui:Toggle name="shake" /></ui:VisualElement>
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Fullscreen" /><ui:Toggle name="fullscreen" /></ui:VisualElement>
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Touch buttons" /><ui:Button name="touch" text="Auto" /></ui:VisualElement>
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Button size" /><ui:Slider name="touch-size" low-value="0.75" high-value="1.5" /></ui:VisualElement>
+            <ui:VisualElement class="setting-row"><ui:Label class="setting-name" text="Button opacity" /><ui:Slider name="touch-opacity" low-value="0.2" high-value="1" /></ui:VisualElement>
+            <ui:Label name="controls" class="controls-text" text="" />
+            <ui:VisualElement class="buttons row">
+                <ui:Button name="reset" text="Reset progress" style="min-width: 100px;" />
+                <ui:Button name="back" text="Back" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="confirm" class="screen dim" style="display: none;">
+            <ui:VisualElement class="panel">
+                <ui:Label class="heading" text="Reset progress?" />
+                <ui:Label class="subtle" text="Levels, gems and best times are erased." style="margin-bottom: 6px;" />
+                <ui:VisualElement class="buttons row">
+                    <ui:Button name="confirm-yes" text="Erase" />
+                    <ui:Button name="confirm-no" text="Keep" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

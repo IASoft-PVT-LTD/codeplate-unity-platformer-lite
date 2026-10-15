@@ -1,0 +1,21 @@
+{
+  "name": "unity-platformer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node checks/run.mjs",
+    "rules": "node checks/rules.mjs",
+    "shots": "node tools/unity.mjs shots",
+    "reach": "node tools/unity.mjs reach",
+    "replay": "node tools/unity.mjs replay",
+    "autoplay": "node tools/unity.mjs autoplay",
+    "feel": "node tools/unity.mjs feel",
+    "build:web": "node tools/unity.mjs build web",
+    "build:windows": "node tools/unity.mjs build windows",
+    "build:macos": "node tools/unity.mjs build macos"
+  }
+}

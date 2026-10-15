@@ -1,0 +1,15 @@
+# Unity regenerates these
+/Library/
+/Temp/
+/Logs/
+/obj/
+/UserSettings/
+/Builds/
+*.csproj
+*.sln
+*.slnx
+.vscode/
+.idea/
+# Screenshots from npm run shots
+/shots/
+Data/

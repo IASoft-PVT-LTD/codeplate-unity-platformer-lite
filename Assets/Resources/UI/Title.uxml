@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- The title screen. TitleScreen.cs wires the buttons by name. -->
+    <ui:VisualElement name="title" class="screen title-screen">
+        <ui:VisualElement name="logo" class="logo" />
+        <ui:Label name="tagline" class="tagline" text="A wind-up robot. A clockwork tower." />
+        <ui:VisualElement class="menu">
+            <ui:Button name="play" text="Play" />
+            <ui:Button name="settings" text="Settings" />
+            <ui:Button name="credits" text="Credits" />
+            <ui:Button name="quit" text="Quit" />
+        </ui:VisualElement>
+        <ui:Label name="version" class="corner-note" text="" />
+    </ui:VisualElement>
+</ui:UXML>
