@@ -39,7 +39,7 @@ Then replace the stub in `docs/project.md` with their answers as short decisions
 
 Work in small steps: make one change, run the checks, look at a screenshot (**Seeing your work**), tell the user, continue.
 
-Once the user has named their game, rewrite `README.md` for their game, and change the product name (Recipe `reskin-and-rebrand.md`). Keep `codeplate.json`, `LICENSE.md` and `CREDITS.md`.
+Once the user has named their game, rewrite `README.md` for their game, change the product name, and rename the worlds, levels and bosses players see (Recipe `reskin-and-rebrand.md`, **Names players see**). Keep `codeplate.json`, `LICENSE.md` and `CREDITS.md`.
 
 ## Architecture
 
@@ -86,7 +86,8 @@ After every change:
 3. **After any movement, level or physics change:**
    - **Reach** (in `LevelTests`) proves every gem, checkpoint and goal is still reachable with the current settings (double and wall jumps included when they're on). If it fails, see the map: `npm run reach -- level=N`.
    - **Replays** prove every level can still be finished (and its boss beaten). If one breaks, see where: `npm run replay -- level=N trace=30`. Then fix the level, or make a new run: `npm run autoplay -- level=N`. Tell the user what happened. `npm run replay` also lists which enemies each run meets and defeats: a new enemy no replay meets isn't tested by them.
-4. **Tell the user** what changed, show the screenshot, and suggest they play it (open the folder in Unity Hub with 6000.6.5f1 and press Play, or `npm run build:web`).
+4. **Web and phones.** If `docs/project.md` says web or phones, check them as you go, not only at the end: after a change to screens, text, colors or controls, take a touch screenshot (`npm run shots -- screen=level level=1 x=8 touch=1`); after a milestone (a reskin, a new world, a new HUD element), make a web build (`npm run build:web`, Recipe `builds.md`) and open it in a browser, also at a phone's landscape size. Can't build or open it here? Tell the user, and how to try it.
+5. **Tell the user** what changed, show the screenshot, and suggest they play it (open the folder in Unity Hub with 6000.6.5f1 and press Play, or `npm run build:web`).
 
 The checks cover: movement against config (speeds, heights, coyote, buffer, corner correction, dash, double and wall jump), collision edge cases, every actor and the boss, every level's format, reachability and replay, determinism, the save format and its migration, every screen, real keyboard input and the touch buttons, pause, results and saving, the art table against `assets.json`, `.meta` files, the one-scene rule, the engine-free Core, and the pinned editor and packages.
 

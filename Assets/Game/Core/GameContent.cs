@@ -12,9 +12,15 @@ namespace Game.Core
         /// <summary>Music track name (an Audio/ file without extension), and the one for its boss.</summary>
         public string Music = "";
         public string BossMusic = "";
-        /// <summary>UI colors for this world's map page, as #rrggbb.</summary>
+        /// <summary>The color of this world's name on its map page, as #rrggbb.</summary>
         public string Accent = "#ffffff";
+        /// <summary>The world's sky color, as #rrggbb. Nothing in the template draws it (the sky is Art/bg/w&lt;N&gt;_sky.png); it's there for your own uses.</summary>
         public string Sky = "#000000";
+        /// <summary>
+        /// A color multiplied over this world's backgrounds, on its map page and in its levels, as #rrggbb.
+        /// White (the default) leaves them as drawn; a world that borrows another world's art can use it to look different.
+        /// </summary>
+        public string Tint = "#ffffff";
         /// <summary>A bonus world ("bonus": true): its last level doesn't need a boss.</summary>
         public bool Bonus;
     }
@@ -103,6 +109,7 @@ namespace Game.Core
                     BossMusic = o.Str("bossMusic"),
                     Accent = o.Str("accent", "#ffffff"),
                     Sky = o.Str("sky", "#000000"),
+                    Tint = o.Str("tint", "#ffffff"),
                     Bonus = o.Bool("bonus"),
                 });
             }

@@ -1,6 +1,6 @@
 // Project rules the C# tests can't see: files on disk against assets.json, Unity's
 // .meta files, the one-scene rule, the engine-free simulation, the pinned editor
-// and package versions, the credit the free license asks for. Pure Node, no Unity
+// and package versions, the web page's colors, the credit the free license asks for. Pure Node, no Unity
 // needed: node checks/rules.mjs
 // Returns problems as { file?, message, warn? }; a warn doesn't fail the checks.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -157,6 +157,19 @@ export function checkProject(root = PROJECT, kit = KIT) {
     }
   } else {
     fail('missing: every path to a project file comes from here', PATHS.projectPaths);
+  }
+
+  // The web page around the web build repeats the game's palette (its :root variables), so a
+  // reskin that changes Game.uss must change it too, or the loading screen keeps the old colors.
+  if (fileSet.has(PATHS.styles) && fileSet.has(PATHS.webPage)) {
+    const vars = (file) => new Map([...(readFileSync(join(root, file), 'utf8').match(/:root\s*\{[^}]*\}/)?.[0] ?? '')
+      .matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim().toLowerCase()]));
+    const game = vars(PATHS.styles);
+    for (const [name, value] of vars(PATHS.webPage)) {
+      if (game.has(name) && game.get(name) !== value) {
+        fail(`${name} is ${value} here but ${game.get(name)} in ${PATHS.styles}: the web page repeats the game's palette, change both (docs/recipes/reskin-and-rebrand.md)`, PATHS.webPage);
+      }
+    }
   }
 
   // The CodePlate Free License asks games made from the template to show the credit. The

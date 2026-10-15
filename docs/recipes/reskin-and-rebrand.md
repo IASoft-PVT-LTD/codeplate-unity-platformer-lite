@@ -10,7 +10,7 @@ All art lives in `Assets/Resources/Art/` and is listed in `assets.json` (frame s
 2. Different frame size or count? Update **both**:
    - `assets.json`: `width`/`height` = ONE frame; `frames` = how many.
    - The `ArtSlots` table in `Assets/Game/Runtime/Art.cs`: `new Slot("player/run", 32, 32, 14)` (frame width, height, frames per second).
-3. A missing animation (the user has no `wall_slide`)? Tell the user; meanwhile keep the placeholder, or point the slot at another strip in `PlayerView.Show`. Don't invent art silently.
+3. A missing animation (the user has no `wall_slide`)? Tell the user; meanwhile keep the placeholder, or point the slot at another strip in `PlayerView.Show`. Don't invent art silently. For art the template never had (a new enemy, pickup or world), see **Stand-in art** below.
 4. Enemies, bosses, pickups: same steps; their anim → strip table is `ActorView.ART`.
 5. Look: `npm run shots -- screen=level level=1 x=10`, and a contact sheet for motion: `... hold=R frames=6 every=4`.
 
@@ -29,9 +29,27 @@ For non-pixel (HD, smooth) art: set `Filter = FilterMode.Bilinear` in `ImportSet
 
 - **Name:** `productName` (and `companyName`) in `ProjectSettings/ProjectSettings.asset` (edit just those lines, or Edit > Project Settings > Player in the editor). Also the title tagline (`Assets/Resources/UI/Title.uxml`), `Content/credits.txt`, `README.md`.
 - **Logo:** `Art/ui/logo.png` (288×72) on the title screen; **icon:** `Art/ui/icon.png` (set it as the Default Icon in Player settings for builds).
-- **Colors:** the variables at the top of `Assets/Resources/UI/Game.uss` (`--brass`, `--cream`, `--panel` ...); world accents in `Content/worlds.json`.
+- **Colors:** the variables at the top of `Assets/Resources/UI/Game.uss` (`--brass`, `--cream`, `--panel` ...); world accents in `Content/worlds.json`. The web page around the game (`Assets/WebGLTemplates/Game/index.html`: loading bar, "turn your phone sideways" card) repeats `--ink`, `--panel`, `--brass`, `--brass-dark` and `--cream`: change them there too (a project rule fails when the two differ).
 - **UI frames:** `Art/ui/panel.png` (9-slice, 16 px borders), `button*.png` (9-slice, 8 px), `node_*.png` (map markers), hearts, gems.
 - **Font:** `Art/ui/font.ttf`, used everywhere (`Ui.ApplyFont`). Any TTF/OTF works; a pixel font looks best at sizes that are multiples of its pixel grid (`--font: 8px` in `Game.uss` for an 8 px font).
+
+## Names players see
+
+A new name or theme means renaming more than the game. Go through each and rename what still belongs to the template's story (Sprocket, gears, clockwork), or list what you left for the user:
+- **Worlds:** `name` and `subtitle` in `Content/worlds.json` (map page, level banner).
+- **Levels:** the `title:` line of each `Assets/Resources/Levels/level_NN.txt` (map, level banner, results).
+- **Bosses:** the name above the boss's health bar is `name=` on the boss's `at` line in its level (`at 60,13: boss type=beetle name=Big_Bertha`, `_` for spaces). Without it, the default in its class under `Assets/Game/Core/Bosses/` shows.
+- **Moves and controls:** the help text on the Settings screen (`SettingsScreen` in `UI/MenuScreens.cs`), if the user renames a move ("dash" to "pounce").
+- Ordinary enemies have no on-screen names. Their ids in code and levels (`walker`, `beetle` ...) can stay; players never see them.
+
+## Stand-in art
+
+The user's pack has no art for something new (an enemy, a pickup, a second world)? Say so, and give the thing its own slot anyway, so the user only has to replace one file later:
+1. Copy a strip with the same frame size and count to the new name (`Art/enemies/walker_walk.png` to `Art/enemies/hopper_walk.png`), or draw a simple one with a script.
+2. List it in `assets.json` with a `use` that starts with `STAND-IN:` and says what to draw (frame size, frames, poses), and in `ArtSlots`. Unity makes its `.meta` on the next check.
+3. Point the new thing at it (`ActorView.ART`), never at another actor's strip, and tell the user which files are stand-ins. A tint in code (`ActorView`) can make it easier to tell apart in the meantime.
+
+A world without its own backgrounds or terrain uses world 1's by itself; a `tint` in `worlds.json` sets it apart (Recipe `add-world.md`).
 
 ## Credits and licenses
 
@@ -40,4 +58,6 @@ For every file the user brings: its `assets.json` entry gets their `license` and
 ## Verify
 
 - `npm run check` passes: `rules` compares every PNG with `assets.json`, and the PlayMode art test compares `Art.cs` with `assets.json`.
-- Screenshots of the title, the map and a level look right: `npm run shots -- screen=title`, `screen=map progress=demo`, `screen=level level=1 x=10`. Open them and look.
+- Screenshots of the title, the map and a level look right: `npm run shots -- screen=title`, `screen=map progress=demo`, `screen=level level=1 x=10`. Open them and look. With a new font, also `screen=settings`, `screen=pause level=1` and `screen=results level=1`: no text cut off or spilling out of its panel.
+- No names from the template's story are left where players see them (**Names players see**), or you told the user which ones you left.
+- The user wants web or phones (`docs/project.md`)? Look at the touch buttons too (`screen=level level=1 x=8 touch=1`), and when the reskin is done, make a web build (Recipe `builds.md`) and open it in a browser, also at a phone's landscape size.

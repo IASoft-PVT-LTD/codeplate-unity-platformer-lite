@@ -56,7 +56,18 @@ namespace Game.Tests
             {
                 Assert.IsNotEmpty(w.Name);
                 Assert.IsNotEmpty(w.Music);
+                foreach (var (key, value) in new[] { ("accent", w.Accent), ("sky", w.Sky), ("tint", w.Tint) })
+                    Assert.That(value, Does.Match("^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"), $"world {w.Id}'s \"{key}\" should be a color like #b48cff");
             }
+        }
+
+        [Test]
+        public void AWorldTintIsOptional()
+        {
+            var worlds = "{\"worlds\": [{\"id\": 1, \"name\": \"One\", \"music\": \"m\"}, {\"id\": 2, \"name\": \"Two\", \"music\": \"m\", \"tint\": \"#b48cff\"}]}";
+            var c = GameContent.Load(path => path == GameContent.WorldsPath ? worlds : Kit.Read(path));
+            Assert.AreEqual("#ffffff", c.World(1).Tint, "no tint = the backgrounds as drawn");
+            Assert.AreEqual("#b48cff", c.World(2).Tint);
         }
 
         [Test]

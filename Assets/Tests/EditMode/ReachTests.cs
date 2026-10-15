@@ -55,7 +55,15 @@ namespace Game.Tests
             "##############",
         };
 
-        static GameConfig Moves(bool wallJump, bool doubleJump) => Kit.Moves(dash: true, doubleJump: doubleJump, wallJump: wallJump);
+        // These rooms are drawn for the template's jump heights (a ledge one jump can't reach), so they
+        // pin them: a higher jump in config.json mustn't make "out of reach without X" reachable.
+        static GameConfig Moves(bool wallJump, bool doubleJump)
+        {
+            var cfg = Kit.Moves(dash: true, doubleJump: doubleJump, wallJump: wallJump);
+            cfg.jumpHeight = 3.25;
+            cfg.airJumpHeight = 2.4;
+            return cfg;
+        }
 
         static LevelData Level(string[] rows) => LevelData.FromRows(Kit.Content.Legend, rows);
 

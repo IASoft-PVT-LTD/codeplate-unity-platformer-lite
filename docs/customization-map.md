@@ -8,6 +8,8 @@
 | Use my own tiles, blocks or backgrounds | `Art/tiles/`, `Art/blocks/`, `Art/bg/`, `assets.json` | `recipes/reskin-and-rebrand.md` |
 | Use 32 px or high-resolution art | `tilePx`, `viewWidth`, `viewHeight` in `Content/config.json`; `ImportSettings.cs` | `recipes/reskin-and-rebrand.md` |
 | Rename the game, logo, icon, UI colors, font | `ProjectSettings.asset` (`productName`), `Art/ui/`, `UI/Game.uss` variables, `Art/ui/font.ttf` | `recipes/reskin-and-rebrand.md` |
+| Rename what players see: worlds, levels, bosses, moves | `Content/worlds.json` (`name`, `subtitle`), each level's `title:`, the boss's `name=` in its level's `at` line, `UI/MenuScreens.cs` (the controls help) | `recipes/reskin-and-rebrand.md` |
+| Tint a world's backgrounds (a world borrowing another's art) | `tint` in `Content/worlds.json` | `recipes/add-world.md` |
 | Make jumping floatier, snappier, higher; a longer dash | `Assets/Resources/Content/config.json` | `recipes/tune-the-feel.md` |
 | Change the camera, screen shake, squash, hit-stop | `cam*`, `shake*`, `landSquash`, `hitstopStomp` in `config.json`; `Level/CameraRig.cs` | `recipes/tune-the-feel.md` |
 | Add or change levels | `Assets/Resources/Levels/level_NN.txt`, then `npm run reach` / `npm run autoplay` | `recipes/add-level.md` |

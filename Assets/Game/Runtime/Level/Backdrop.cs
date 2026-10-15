@@ -5,6 +5,7 @@ namespace Game.Runtime
     /// <summary>
     /// Three background layers per world (Art/bg/w&lt;N&gt;_sky, _far, _near): the sky stays put,
     /// the far and near layers scroll slower than the level (parallax) and repeat sideways.
+    /// A world without its own backgrounds uses world 1's; the world's "tint" (worlds.json) colors all three.
     /// View only. Call Follow(cameraPosition) every frame.
     /// </summary>
     public sealed class Backdrop : MonoBehaviour
@@ -28,6 +29,9 @@ namespace Game.Runtime
         void Build(int world)
         {
             string prefix = Resources.Load<Texture2D>($"Art/bg/w{world}_sky") != null ? $"bg/w{world}_" : "bg/w1_";
+            // The world's "tint" in worlds.json (white = as drawn): a world borrowing world 1's art can still look its own.
+            var info = App.Content?.World(world);
+            var tint = info != null && ColorUtility.TryParseHtmlString(info.Tint, out var t) ? t : Color.white;
             for (int i = 0; i < 3; i++)
             {
                 var tex = App.Art.Texture(prefix + Layers[i]);
@@ -35,6 +39,7 @@ namespace Game.Runtime
                 go.transform.SetParent(transform, false);
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = -100 + i;
+                sr.color = tint;
                 if (tex == null) continue;
                 tex.wrapMode = TextureWrapMode.Repeat;
                 float ppu = App.Art.PixelsPerTile;

@@ -13,7 +13,7 @@ Bosses are actors with health, phases and a small state machine (`Assets/Game/Co
    - `Anim` names per state; `IsDangerous` true while touching it hurts.
 3. **Numbers** go in `Content/enemies.json` under a new key, with a matching class in `EnemyConfig.cs`.
 4. **Register** it: `["name"] = () => new Name()` in `LevelData.ActorTypes`. Levels place it with `B` and `at x,y: boss type=name` (optional `name=Big_Bertha health=4`).
-5. **Art:** strips under `Art/bosses/`, listed in `assets.json` and `ArtSlots` (`Art.cs`), mapped per anim in `ActorView.ART`. ActorView already shakes the sprite during `telegraph`/`windup`/`warn` anims and fades `defeated`.
+5. **Art:** strips under `Art/bosses/`, listed in `assets.json` and `ArtSlots` (`Art.cs`), mapped per anim in `ActorView.ART` (no art yet? stand-in strips of its own: Recipe `reskin-and-rebrand.md`, **Stand-in art**). Its on-screen name is `name=` on its `at` line, with a default in its class. ActorView already shakes the sprite during `telegraph`/`windup`/`warn` anims and fades `defeated`.
 6. **Tests** in `Assets/Tests/EditMode/BossTests.cs`: it wakes, its attack hurts a player in the way, it can only be hurt in its open state (set `boss.Current = State.X` and use `DropOn`), N hits defeat it and open the goal.
 7. **Build its arena** (Recipe `add-level.md`, step 3) and record the replay: `npm run autoplay -- level=N`. If the bot can't win, widen the opening (longer stun, slower attack) rather than weakening the bot's check.
 

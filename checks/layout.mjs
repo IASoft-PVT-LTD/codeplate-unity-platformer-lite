@@ -34,6 +34,8 @@ export const PATHS = {
   art: `${LAYOUT.game}/Resources/Art`,
   audio: `${LAYOUT.game}/Resources/Audio`,
   credits: `${LAYOUT.game}/Resources/Content/credits.txt`,
+  styles: `${LAYOUT.game}/Resources/UI/Game.uss`,
+  webPage: `${LAYOUT.game}/WebGLTemplates/Game/index.html`,
   bootScene: `${LAYOUT.game}/Scenes/Boot.unity`,
   coreAsmdef: `${LAYOUT.game}/Game/Core/Game.Core.asmdef`,
   core: `${LAYOUT.game}/Game/Core/`,
