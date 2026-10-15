@@ -13,6 +13,7 @@ export const LAYOUT = {
   replays: 'replays',
   docs: 'docs',
   shots: 'shots',
+  assets: 'assets.json', // the asset manifest
 };
 
 export const KIT = resolve(dirname(fileURLToPath(import.meta.url)), '..');

@@ -323,7 +323,7 @@ namespace Game.Tests
             foreach (var name in new[] { "jump", "coin", "gem", "stomp", "hurt", "die", "goal", "click", "music_title" })
                 Assert.IsNotNull(Resources.Load<AudioClip>("Audio/" + name), $"Audio/{name}");
             // The art table in Art.cs agrees with assets.json (frame sizes).
-            var manifest = (JsonObject)Json.Parse(File.ReadAllText("assets.json"), "assets.json");
+            var manifest = (JsonObject)Json.Parse(File.ReadAllText(ProjectPaths.AssetsManifest), "assets.json");
             var sizes = new Dictionary<string, (int, int)>();
             foreach (var o in manifest.Arr("assets"))
             {

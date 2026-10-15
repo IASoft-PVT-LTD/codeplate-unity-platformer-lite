@@ -22,6 +22,8 @@ namespace Game.Core
         public const string Replays = "replays";
         /// <summary>The docs (architecture, levels, movement, recipes).</summary>
         public const string Docs = "docs";
+        /// <summary>The asset manifest: every art and audio file with its size and licence.</summary>
+        public const string AssetsManifest = "assets.json";
         /// <summary>Screenshots from npm run shots (not part of the project).</summary>
         public const string Shots = "shots";
 

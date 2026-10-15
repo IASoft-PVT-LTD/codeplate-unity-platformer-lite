@@ -31,7 +31,7 @@ function pngSize(buf) {
   return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
 }
 
-// `root` is the Unity project folder, `kit` the folder holding assets.json, codeplate.json and checks/.
+// `root` is the Unity project folder, `kit` the folder holding codeplate.json, LICENSE.md and checks/.
 export function checkProject(root = PROJECT, kit = KIT) {
   const problems = [];
   const fail = (message, file) => problems.push({ message, ...(file ? { file } : {}) });
@@ -43,7 +43,7 @@ export function checkProject(root = PROJECT, kit = KIT) {
   // assets.json
   let manifest = null;
   try {
-    manifest = JSON.parse(readFileSync(join(kit, 'assets.json'), 'utf8'));
+    manifest = JSON.parse(readFileSync(join(root, LAYOUT.assets), 'utf8'));
   } catch (e) {
     fail(`assets.json is missing or not valid JSON (${e.message})`, 'assets.json');
   }
@@ -150,7 +150,7 @@ export function checkProject(root = PROJECT, kit = KIT) {
   if (fileSet.has(PATHS.projectPaths)) {
     const cs = readFileSync(join(root, PATHS.projectPaths), 'utf8');
     const constant = (name) => cs.match(new RegExp(`const string ${name} = "([^"]*)"`))?.[1];
-    for (const [name, key] of [['Game', 'game'], ['Replays', 'replays'], ['Docs', 'docs'], ['Shots', 'shots']]) {
+    for (const [name, key] of [['Game', 'game'], ['Replays', 'replays'], ['Docs', 'docs'], ['Shots', 'shots'], ['AssetsManifest', 'assets']]) {
       if (constant(name) !== LAYOUT[key]) {
         fail(`ProjectPaths.${name} is "${constant(name)}" but checks/layout.mjs says "${LAYOUT[key]}": change both together`, PATHS.projectPaths);
       }
