@@ -583,7 +583,7 @@ Toggle:focus #unity-checkmark {
 
 .credits-text {
     white-space: normal;
-    width: 300px;
+    width: 296px;
     -unity-text-align: upper-left;
     color: var(--cream);
 }
@@ -591,6 +591,36 @@ Toggle:focus #unity-checkmark {
 .credits-scroll {
     height: 150px;
     width: 310px;
+}
+
+/* A slim scroll bar in the game's palette, no arrow buttons; the text wraps, so never sideways. */
+.credits-scroll .unity-scroller--vertical {
+    width: 6px;
+    min-width: 6px;
+    margin-left: 4px;
+}
+
+.credits-scroll .unity-scroller__low-button,
+.credits-scroll .unity-scroller__high-button {
+    display: none;
+}
+
+.credits-scroll .unity-scroller__slider {
+    margin: 0;
+    width: 6px;
+    min-width: 6px;
+}
+
+.credits-scroll .unity-base-slider__tracker {
+    background-color: var(--ink);
+    border-width: 0;
+}
+
+.credits-scroll .unity-base-slider__dragger {
+    background-color: var(--muted);
+    border-width: 0;
+    left: 0;
+    width: 6px;
 }
 
 /* ------------------------------------------------------------------ touch controls */

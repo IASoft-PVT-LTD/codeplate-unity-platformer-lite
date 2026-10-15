@@ -3,7 +3,7 @@
     <ui:VisualElement name="credits" class="screen dim">
         <ui:VisualElement class="panel">
             <ui:Label class="heading" text="Credits" />
-            <ui:ScrollView name="scroll" class="credits-scroll">
+            <ui:ScrollView name="scroll" class="credits-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden">
                 <ui:Label name="credits-text" class="credits-text" text="" />
             </ui:ScrollView>
             <ui:Button name="back" text="Back" />

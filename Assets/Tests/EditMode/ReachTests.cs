@@ -102,5 +102,28 @@ namespace Game.Tests
             var bot = new Autopilot(Level(HighLedge), Moves(false, true), Kit.Enemies) { MaxTicks = 3000 };
             Assert.IsTrue(bot.Run(), "the bot should finish the room:\n" + string.Join("\n", bot.Log));
         }
+
+        // Boarded planks, five tiles tall: too high to jump, but a pounce (dash) goes through them.
+        static readonly string[] Planks =
+        {
+            "......................",
+            ".......dd.............",
+            ".......dd.............",
+            ".......dd.............",
+            ".......dd.............",
+            "..P....dd.........G...",
+            "######################",
+        };
+
+        [Test]
+        public void DashWallsArePassableOnlyByDashing()
+        {
+            var off = Analyze(Planks, Kit.Moves(dash: false));
+            Assert.IsFalse(off.AllReached, "without a dash the planks are a wall:\n" + Reach.Report(Level(Planks), off));
+            var on = Analyze(Planks, Kit.Moves(dash: true));
+            Assert.IsTrue(on.AllReached, "a dash goes through the planks:\n" + Reach.Report(Level(Planks), on));
+            var bot = new Autopilot(Level(Planks), Kit.Moves(dash: true), Kit.Enemies) { MaxTicks = 3000 };
+            Assert.IsTrue(bot.Run(), "the bot should dash through and finish:\n" + string.Join("\n", bot.Log));
+        }
     }
 }

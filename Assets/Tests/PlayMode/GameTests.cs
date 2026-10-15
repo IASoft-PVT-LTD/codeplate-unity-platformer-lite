@@ -286,6 +286,10 @@ namespace Game.Tests
             yield return Frames(2);
             Assert.IsInstanceOf<CreditsScreen>(App.Screens.Current);
             StringAssert.Contains("CodePlate", App.Screens.Root.Q<Label>("credits-text").text);
+            // The text wraps and the list scrolls vertically only: no sideways scroll bar.
+            var scroll = App.Screens.Root.Q<ScrollView>("scroll");
+            Assert.AreEqual(ScrollerVisibility.Hidden, scroll.horizontalScrollerVisibility);
+            Assert.AreEqual(ScrollViewMode.Vertical, scroll.mode);
         }
 
         [UnityTest]

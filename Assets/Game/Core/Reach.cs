@@ -167,7 +167,9 @@ namespace Game.Core
                         prev = path[t];
                         hit.Clear();
                         Collide.MoveX(b, grid, d.X, config.ledgeCorrection, true, hit, dash[t] ? Collide.WallBreak.PassThrough : Collide.WallBreak.None);
-                        Collide.MoveY(b, grid, d.Y, config.cornerCorrection, false, null, hit);
+                        // No vertical move, no vertical collision: a dash passing through a dash wall
+                        // would otherwise take the wall it's inside for a ceiling.
+                        if (d.Y != 0) Collide.MoveY(b, grid, d.Y, config.cornerCorrection, false, null, hit);
                         Mark(r, b.Pos, size, targetCells, s);
                         if (Collide.TouchingSpikes(b, grid) || b.Top > grid.Height + 1) break;
                         if (hit.Floor && t > 0)
